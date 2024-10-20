@@ -1,0 +1,69 @@
+
+### 
+GET http://localhost:3000/test_view
+
+###
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+    "userName": "bert",
+    "password": "pass",
+    "isStaff": "false"
+}
+
+###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "userName": "bert",
+    "password": "pass"
+}
+###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "userName": "bert",
+    "password": "pasdds"
+}
+###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "userName": "best",
+    "password": "pass"
+}
+
+###
+
+POST http://localhost:3000/logout
+Content-Type: application/json
+
+{
+    "userName": "bert"
+}
+
+###
+
+POST http://localhost:3000/logout
+Content-Type: application/json
+
+{
+    "userName": "berddt"
+}
+
+###
+
+POST http://localhost:3000/restrictedRoute
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6ImJlcnQiLCJpYXQiOjE3MjkzOTA1NTUsImV4cCI6MTcyOTM5MTE1NX0.XYDYc4Xj_mOUzy5HFrpGs3cDkQxBXQNijfux921Br9s
+
+{
+    "userName": "berddt"
+}
