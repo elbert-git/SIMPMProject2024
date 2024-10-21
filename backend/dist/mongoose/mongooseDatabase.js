@@ -49,6 +49,59 @@ class MongooseDB {
             }
         });
     }
+    static getRoom(roomId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const room = yield mongooseSchemas_1.RoomDataModel.find({ roomId });
+            return room[0];
+        });
+    }
+    static getAllRooms() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const rooms = yield mongooseSchemas_1.RoomDataModel.find({});
+            return rooms;
+        });
+    }
+    static createRoom(roomData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const roomDoc = new mongooseSchemas_1.RoomDataModel(roomData);
+            yield roomDoc.save();
+            return {
+                status: "ok",
+                message: `${roomData.roomName} has been created`,
+                roomData,
+            };
+        });
+    }
+    static deleteRoom(roomId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const room = yield MongooseDB.getRoom(roomId);
+            if (!room) {
+                throw "room doesn't exist";
+            }
+            yield mongooseSchemas_1.RoomDataModel.findOneAndDelete({ roomId });
+            return {
+                status: "ok",
+                message: `${room.roomName} has been deleted`,
+            };
+        });
+    }
+    static updateRoom(roomId, changes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // get room
+            const room = yield MongooseDB.getRoom(roomId);
+            if (!room) {
+                throw "room doesnt exist";
+            }
+            // update all relevant keys
+            const keys = Object.keys(changes);
+            keys.forEach((key) => {
+                room[key] = changes[key];
+            });
+            yield room.save();
+            // return status
+            return { status: "ok", message: `${room.roomName} was updated` };
+        });
+    }
 }
 MongooseDB.url = `mongodb+srv://elbertnathanaeltkg:${constants_1.default.mongoose_password}@cluster0.lahxp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 exports.default = MongooseDB;
@@ -57,6 +110,12 @@ exports.MongooseDatabase = {
         getUser: MongooseDB.getUser,
         saveNewUser: MongooseDB.saveNewUser,
     },
-    rooms: {},
+    rooms: {
+        createRoom: MongooseDB.createRoom,
+        getRoom: MongooseDB.getRoom,
+        getAllRooms: MongooseDB.getAllRooms,
+        deleteRoom: MongooseDB.deleteRoom,
+        updateRoom: MongooseDB.updateRoom,
+    },
     bookings: {},
 };

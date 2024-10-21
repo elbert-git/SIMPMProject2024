@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const auth_1 = __importDefault(require("./auth"));
 const mongooseDatabase_1 = require("./mongoose/mongooseDatabase");
+const utilities_1 = require("./utilities");
 const expressApp = (0, express_1.default)();
 expressApp.use(express_1.default.json());
 // ---------------------------------- room stuff
@@ -112,10 +113,92 @@ expressApp.post("/createRoom", Authenticate, (req, res) => __awaiter(void 0, voi
     try {
         // get user data
         const getUser = yield mongooseDatabase_1.MongooseDatabase.users.getUser(req.email);
-        //
+        // make sure is staff
+        if (!getUser.isStaff) {
+            throw "User is not authorized to do this action";
+        }
+        // get data from body
+        const roomDetails = {
+            roomName: req.body.roomName,
+            roomCapacity: req.body.roomCapacity,
+            roomId: (0, utilities_1.generateRandomString)(10),
+            isActive: false,
+            pricePerHour: req.body.pricePerHour,
+            promoCodes: req.body.promoCodes,
+        };
+        const result = yield mongooseDatabase_1.MongooseDatabase.rooms.createRoom(roomDetails);
+        res
+            .status(200)
+            .send({ status: "ok", message: `${roomDetails.roomName} created` });
     }
     catch (error) {
         res.status(500).send({ status: "failed", message: error });
+    }
+}));
+expressApp.get("/getAllRooms", Authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // get rooms
+        const rooms = yield mongooseDatabase_1.MongooseDatabase.rooms.getAllRooms();
+        res.status(200).json({ status: "ok", message: "got all rooms", rooms });
+    }
+    catch (error) {
+        res.status(500).send({ status: "failed", message: error });
+    }
+}));
+expressApp.get("/getRoom", Authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // get rooms
+        const room = yield mongooseDatabase_1.MongooseDatabase.rooms.getRoom(req.body.roomId);
+        res.status(200).json({ status: "ok", message: "got room", room });
+    }
+    catch (error) {
+        res.status(500).send({ status: "failed", message: error });
+    }
+}));
+expressApp.delete("/deleteRoom", Authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // get user data
+        const getUser = yield mongooseDatabase_1.MongooseDatabase.users.getUser(req.email);
+        // make sure is staff
+        if (!getUser.isStaff) {
+            throw "User is not authorized to do this action";
+        }
+        // get rooms
+        const result = yield mongooseDatabase_1.MongooseDatabase.rooms.deleteRoom(req.body.roomId);
+        res.status(200).json(result);
+    }
+    catch (error) {
+        res
+            .status(500)
+            .send({ status: "failed", message: error.toString() });
+    }
+}));
+expressApp.post("/updateRoom", Authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // get user data
+        const getUser = yield mongooseDatabase_1.MongooseDatabase.users.getUser(req.email);
+        // make sure is staff
+        if (!getUser.isStaff) {
+            throw "User is not authorized to do this action";
+        }
+        // get rooms
+        const roomId = req.body.roomId;
+        const changes = req.body.changes;
+        const result = yield mongooseDatabase_1.MongooseDatabase.rooms.updateRoom(roomId, changes);
+        res.status(200).json(result);
+    }
+    catch (error) {
+        res
+            .status(500)
+            .send({ status: "failed", message: error.toString() });
+    }
+}));
+expressApp.post("/createBooking", Authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // get user data
+    const getUser = yield mongooseDatabase_1.MongooseDatabase.users.getUser(req.email);
+    // make sure is student
+    if (getUser.isStaff) {
+        throw "User is not authorized to do this action";
     }
 }));
 exports.default = expressApp;

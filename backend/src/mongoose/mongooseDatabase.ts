@@ -1,4 +1,4 @@
-import { UserDataModel } from "./mongooseSchemas";
+import { RoomData, RoomDataModel, UserDataModel } from "./mongooseSchemas";
 import mongoose, { mongo } from "mongoose";
 import constants from "../constants";
 import { StatusMessage } from "../utilities";
@@ -33,6 +33,52 @@ export default class MongooseDB {
       return { status: "failed", message: e };
     }
   }
+  static async getRoom(roomId: string) {
+    const room = await RoomDataModel.find({ roomId });
+    return room[0];
+  }
+  static async getAllRooms() {
+    const rooms = await RoomDataModel.find({});
+    return rooms;
+  }
+  static async createRoom(roomData: RoomData): Promise<StatusMessage> {
+    const roomDoc = new RoomDataModel(roomData);
+    await roomDoc.save();
+    return {
+      status: "ok",
+      message: `${roomData.roomName} has been created`,
+      roomData,
+    };
+  }
+  static async deleteRoom(roomId: string): Promise<StatusMessage> {
+    const room = await MongooseDB.getRoom(roomId);
+    if (!room) {
+      throw "room doesn't exist";
+    }
+    await RoomDataModel.findOneAndDelete({ roomId });
+    return {
+      status: "ok",
+      message: `${room.roomName} has been deleted`,
+    };
+  }
+  static async updateRoom(
+    roomId: string,
+    changes: RoomData | any
+  ): Promise<StatusMessage> {
+    // get room
+    const room: RoomData | any = await MongooseDB.getRoom(roomId);
+    if (!room) {
+      throw "room doesnt exist";
+    }
+    // update all relevant keys
+    const keys = Object.keys(changes);
+    keys.forEach((key) => {
+      room[key] = changes[key];
+    });
+    await room.save();
+    // return status
+    return { status: "ok", message: `${room.roomName} was updated` };
+  }
 }
 
 export const MongooseDatabase = {
@@ -40,6 +86,12 @@ export const MongooseDatabase = {
     getUser: MongooseDB.getUser,
     saveNewUser: MongooseDB.saveNewUser,
   },
-  rooms: {},
+  rooms: {
+    createRoom: MongooseDB.createRoom,
+    getRoom: MongooseDB.getRoom,
+    getAllRooms: MongooseDB.getAllRooms,
+    deleteRoom: MongooseDB.deleteRoom,
+    updateRoom: MongooseDB.updateRoom,
+  },
   bookings: {},
 };

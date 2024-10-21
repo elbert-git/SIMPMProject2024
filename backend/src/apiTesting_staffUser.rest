@@ -1,10 +1,65 @@
 
 ###
 
-POST http://localhost:3000/restrictedRoute
+POST http://localhost:3000/createRoom
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVsYmVydC5uYXRoYW5hZWxAc2ltLmNvbSIsImlhdCI6MTcyOTQ4NjEyOH0.0r7B097ZEvucq2O0jaONJHFVFjHek66_LDZLr3gkfr8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVsYmVydC5uYXRoYW5hZWxAc2ltLmNvbSIsImlhdCI6MTcyOTQ5MzcwOH0.clq-nyd0Xg6KvtAuGhdqjVxvZBYaTuV12jfwMWBReDo
 
 {
-    "userName": "berddt"
+    "roomName": "small room",
+    "roomCapacity": "3",
+    "pricePerHour": "2",
+    "promoCodes": {}
+}
+
+###
+GET http://localhost:3000/getAllRooms
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVsYmVydC5uYXRoYW5hZWxAc2ltLmNvbSIsImlhdCI6MTcyOTQ5MzcwOH0.clq-nyd0Xg6KvtAuGhdqjVxvZBYaTuV12jfwMWBReDo
+
+###
+GET http://localhost:3000/getRoom
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVsYmVydC5uYXRoYW5hZWxAc2ltLmNvbSIsImlhdCI6MTcyOTQ5MzcwOH0.clq-nyd0Xg6KvtAuGhdqjVxvZBYaTuV12jfwMWBReDo
+
+{
+    "roomId": "M9YxU69h6V"
+}
+
+###
+DELETE http://localhost:3000/deleteRoom
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImR1ZGUubmF0aGFuYWVsQHNpbS5jb20iLCJpYXQiOjE3Mjk1MTI1Njh9.Rkr853Pi7eKPCZi55eFcLqmULdTDm8gog4fasNme24I
+
+{
+    "roomId": "M9YxU69h6V"
+}
+
+###
+POST http://localhost:3000/updateRoom
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVsYmVydC5uYXRoYW5hZWxAc2ltLmNvbSIsImlhdCI6MTcyOTQ5MzcwOH0.clq-nyd0Xg6KvtAuGhdqjVxvZBYaTuV12jfwMWBReDo
+
+{
+    "roomId": "N8D4BzAzL0",
+    "changes": {
+        "roomName": "my room",
+        "promoCodes": {
+            "sg65": 0.2
+        }
+    }
+}
+
+###
+POST http://localhost:3000/updateRoom
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVsYmVydC5uYXRoYW5hZWxAc2ltLmNvbSIsImlhdCI6MTcyOTQ5MzcwOH0.clq-nyd0Xg6KvtAuGhdqjVxvZBYaTuV12jfwMWBReDo
+
+{
+    "roomId": "N8D4BzAzL0",
+    "changes": {
+        "roomName": "my room",
+        "promoCodes": {
+            "sg65": 0.2
+        }
+    }
 }
