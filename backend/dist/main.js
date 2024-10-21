@@ -13,20 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 console.clear();
+console.log("=============================");
 const mongooseDatabase_1 = __importDefault(require("./mongoose/mongooseDatabase"));
 const expressServer_1 = __importDefault(require("./expressServer"));
 const execution = () => __awaiter(void 0, void 0, void 0, function* () {
     // start up db
     yield mongooseDatabase_1.default.init();
-    // testing
-    const userData = {
-        userName: "bert",
-        email: "bert@gmail.com",
-        hashedPassword: "password",
-        isStaff: true,
-        activeAccessToken: ""
-    };
-    yield mongooseDatabase_1.default.saveNewUser(userData);
     // start up server
     const port = 3000;
     expressServer_1.default.listen(port, () => {

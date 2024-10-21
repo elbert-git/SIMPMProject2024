@@ -1,0 +1,37 @@
+# Parsing the brief
+2 users
+- staff
+- users
+
+staff user
+- can create rooms
+- can make launch/disable rooms
+- can set crud every room property
+
+room schema
+- room id
+- room name
+- isActive
+- price
+- date/time
+- capacity of room
+- promotional rooms
+
+students
+- see list sof rooms
+- create room bookings
+
+booking scheme
+- room id
+- timing slot
+
+
+# todo:
+>>> create room
+>>> edit room
+>>> delete room
+>>> get rooms
+
+
+--- later
+> separeate endpoitns to auth/ student/ staff/

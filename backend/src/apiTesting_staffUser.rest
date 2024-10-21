@@ -1,0 +1,10 @@
+
+###
+
+POST http://localhost:3000/restrictedRoute
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVsYmVydC5uYXRoYW5hZWxAc2ltLmNvbSIsImlhdCI6MTcyOTQ4NjEyOH0.0r7B097ZEvucq2O0jaONJHFVFjHek66_LDZLr3gkfr8
+
+{
+    "userName": "berddt"
+}

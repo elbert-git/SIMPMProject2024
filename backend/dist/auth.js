@@ -34,30 +34,34 @@ class Auth {
                 hashedPassword,
                 isStaff: newUserData.isStaff,
                 email: newUserData.email,
-                activeAccessToken: ""
+                activeAccessToken: "",
             };
             mongooseDatabase_1.default.saveNewUser(userData);
             return userData;
         });
     }
-    static login(email, password) {
+    static login(credentials) {
         return __awaiter(this, void 0, void 0, function* () {
             // check if user name exists
-            const getUser = yield mongooseDatabase_1.default.getUser(email);
+            const getUser = yield mongooseDatabase_1.default.getUser(credentials.email);
             if (!getUser) {
                 throw "username doesn't exist";
             }
             // match passwords
-            const match = yield bcrypt_1.default.compare(password, getUser.hashedPassword);
-            // if match create keys 
+            const match = yield bcrypt_1.default.compare(credentials.password, getUser.hashedPassword);
+            // if match create keys
             if (match) {
                 // create token
-                const accessToken = jsonwebtoken_1.default.sign({ email }, jwtSecret, { expiresIn: "10m" });
+                const accessToken = jsonwebtoken_1.default.sign({ email: credentials.email }, jwtSecret);
                 // save active token
                 getUser.activeAccessToken = accessToken;
                 yield getUser.save();
-                // return token 
-                return accessToken;
+                // return token
+                return {
+                    status: "ok",
+                    message: `${credentials.email} is logged in`,
+                    accessToken: accessToken,
+                };
             }
             // else return error
             else {
@@ -65,20 +69,61 @@ class Auth {
             }
         });
     }
+    static logout(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // check if user name exists
+            const getUser = yield mongooseDatabase_1.default.getUser(email);
+            if (!getUser) {
+                throw "username with email doesn't exist";
+            }
+            // remove user active key
+            getUser.activeAccessToken = "";
+            yield getUser.save();
+            //return status
+            return {
+                status: "ok",
+                message: `user with email ${email} has been logged out`,
+            };
+        });
+    }
     static verifyJwt(token) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = { status: "", userData: null };
-            jsonwebtoken_1.default.verify(token, jwtSecret, (err, data) => {
-                if (err) {
-                    result.status = "ok";
+            // attempt to decode
+            const decodedData = Auth.decodeJwt(token);
+            if (decodedData) {
+                // check if key is active
+                const getUser = yield mongooseDatabase_1.default.getUser(decodedData.email);
+                const match = getUser.activeAccessToken === token;
+                if (match) {
+                    return { status: "ok", message: "verified successfully", decodedData };
                 }
                 else {
-                    result.status = "ok";
-                    result.userData = data;
+                    // token is inactive therefor suspicious
+                    console.log("inactive token used, revoking access");
+                    //revoke current active token
+                    getUser.activeAccessToken = "";
+                    yield getUser.save();
+                    //return
+                    return { status: "failed", message: "token expired" };
                 }
-            });
-            return result;
+            }
+            else {
+                // could not decode
+                return { status: "failed", message: "failed to verify" };
+            }
         });
+    }
+    static decodeJwt(token) {
+        let result = null;
+        jsonwebtoken_1.default.verify(token, jwtSecret, (err, data) => {
+            if (err) {
+                result = null;
+            }
+            else {
+                result = data;
+            }
+        });
+        return result;
     }
 }
 exports.default = Auth;

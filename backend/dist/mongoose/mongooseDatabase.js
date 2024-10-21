@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MongooseDatabase = void 0;
 const mongooseSchemas_1 = require("./mongooseSchemas");
 const mongoose_1 = __importDefault(require("mongoose"));
 const constants_1 = __importDefault(require("../constants"));
@@ -19,7 +20,7 @@ class MongooseDB {
     static init() {
         return __awaiter(this, void 0, void 0, function* () {
             yield mongoose_1.default.connect(MongooseDB.url);
-            console.log('connected to mongoose');
+            console.log("connected to mongoose");
         });
     }
     static getUser(email) {
@@ -51,3 +52,11 @@ class MongooseDB {
 }
 MongooseDB.url = `mongodb+srv://elbertnathanaeltkg:${constants_1.default.mongoose_password}@cluster0.lahxp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 exports.default = MongooseDB;
+exports.MongooseDatabase = {
+    users: {
+        getUser: MongooseDB.getUser,
+        saveNewUser: MongooseDB.saveNewUser,
+    },
+    rooms: {},
+    bookings: {},
+};

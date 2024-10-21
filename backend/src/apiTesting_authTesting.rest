@@ -1,0 +1,89 @@
+
+### 
+GET http://localhost:3000/test_view
+
+###
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+    "email": "elbert.nathanael@sim.com",
+    "userName": "elbert",
+    "password": "password",
+    "isStaff": "true"
+}
+
+###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "elbert.nathanael@sim.com",
+    "password": "password"
+}
+###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "elbert.nathanael@sim.com",
+    "password": "pasdds"
+}
+###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "best",
+    "password": "pass"
+}
+
+###
+
+POST http://localhost:3000/logout
+Content-Type: application/json
+
+{
+    "email": "elbert.nathanael@sim.com"
+}
+
+###
+
+POST http://localhost:3000/logout
+Content-Type: application/json
+
+{
+    "email": "berddt"
+}
+
+###
+
+POST http://localhost:3000/restrictedRoute
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVsYmVydC5uYXRoYW5hZWxAc2ltLmNvbSIsImlhdCI6MTcyOTQ4NjEyOH0.0r7B097ZEvucq2O0jaONJHFVFjHek66_LDZLr3gkfr8
+
+{
+    "userName": "berddt"
+}
+
+###
+POST http://localhost:3000/restrictedRoute
+Content-Type: application/json
+Authorization: Bearer wrongtoken
+
+{
+    "userName": "berddt"
+}
+
+###
+
+POST http://localhost:3000/restrictedRoute
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVsYmVydC5uYXRoYW5hZWxAc2ltLmNvbSIsImlhdCI6MTcyOTQ4NTg3NX0.j7ClpNynXtWX9UEknu9-lC5_wile_9HQQddj4ooku2s
+
+{
+    "userName": "berddt"
+}
