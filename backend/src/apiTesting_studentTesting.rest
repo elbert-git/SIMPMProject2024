@@ -1,0 +1,41 @@
+###
+
+POST http://localhost:3000/createBooking
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0dWRlbnQubmF0aGFuYWVsQHNpbS5jb20iLCJpYXQiOjE3Mjk1MTU0MTh9.tjCGeICBWb7aoSXyn1xtyZdZQvkBle4LmiT-4ze_XBI
+
+{
+    "email": "student.nathanael@sim.com",
+    "roomId": "N8D4BzAzL0",
+    "time": "9"
+}
+
+###
+
+GET http://localhost:3000/getBookingsByRoomId
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0dWRlbnQubmF0aGFuYWVsQHNpbS5jb20iLCJpYXQiOjE3Mjk1MTU0MTh9.tjCGeICBWb7aoSXyn1xtyZdZQvkBle4LmiT-4ze_XBI
+
+{
+    "roomId": "N8D4BzAzL0"
+}
+
+###
+
+GET http://localhost:3000/getBookingsByUserEmail
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0dWRlbnQubmF0aGFuYWVsQHNpbS5jb20iLCJpYXQiOjE3Mjk1MTU0MTh9.tjCGeICBWb7aoSXyn1xtyZdZQvkBle4LmiT-4ze_XBI
+
+{
+    "email": "student.nathanael@sim.com"
+}
+
+###
+
+DELETE http://localhost:3000/deleteBooking
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0dWRlbnQubmF0aGFuYWVsQHNpbS5jb20iLCJpYXQiOjE3Mjk1MTU0MTh9.tjCGeICBWb7aoSXyn1xtyZdZQvkBle4LmiT-4ze_XBI
+
+{
+    "id": "6716560c9766e84b3b3b5f16"
+}

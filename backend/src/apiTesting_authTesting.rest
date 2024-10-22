@@ -7,9 +7,9 @@ POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-    "email": "dude.nathanael@sim.com",
-    "userName": "someDude",
-    "password": "password",
+    "email": "student.nathanael@sim.com",
+    "userName": "nath",
+    "password": "sss",
     "isStaff": "false"
 }
 
@@ -19,8 +19,8 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-    "email": "dude.nathanael@sim.com",
-    "password": "password"
+    "email": "student.nathanael@sim.com",
+    "password": "sss"
 }
 ###
 

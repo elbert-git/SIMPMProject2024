@@ -102,6 +102,75 @@ class MongooseDB {
             return { status: "ok", message: `${room.roomName} was updated` };
         });
     }
+    static createBooking(email, roomId, time) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // get user
+            const user = yield MongooseDB.getUser(email);
+            console.log(user);
+            if (!user) {
+                throw `user with email ${email} not done`;
+            }
+            //get room
+            const room = yield MongooseDB.getRoom(roomId);
+            console.log(room);
+            if (!user) {
+                throw `room with id ${roomId} not done`;
+            }
+            // check for booking collisions
+            const booking = yield mongooseSchemas_1.BookingDataModel.find({ time, roomId });
+            if (booking.length > 0) {
+                console.log("booking", booking);
+                throw "Room is not available at the requested time";
+            }
+            // create booking
+            const newBookingDetails = {
+                bookerEmail: user.email,
+                bookerUserName: user.userName,
+                time: time,
+                roomId: room.roomId,
+            };
+            const newDoc = new mongooseSchemas_1.BookingDataModel(newBookingDetails);
+            yield newDoc.save();
+            return {
+                status: "ok",
+                message: `${user.userName} has booked ${room.roomName} at ${time}`,
+                newDoc,
+            };
+        });
+    }
+    static getBookingsByUserEmail(email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield mongooseSchemas_1.BookingDataModel.find({ bookerEmail: email });
+        });
+    }
+    static getBookingsByRoomId(roomId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield mongooseSchemas_1.BookingDataModel.find({ roomId });
+        });
+    }
+    static deleteBooking(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield mongooseSchemas_1.BookingDataModel.findByIdAndDelete(id);
+            return { status: "ok", message: "booking deleted" };
+        });
+    }
+    static updateBooking(bookingId, changes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // get room
+            const booking = yield mongooseSchemas_1.BookingDataModel.findById(bookingId);
+            if (!booking) {
+                throw "room doesnt exist";
+            }
+            // update all relevant keys
+            const keys = Object.keys(changes);
+            keys.forEach((key) => {
+                booking[key] = changes[key];
+            });
+            yield booking.save();
+            // return status
+            return { status: "ok", message: `booking was updated` };
+        });
+    }
 }
 MongooseDB.url = `mongodb+srv://elbertnathanaeltkg:${constants_1.default.mongoose_password}@cluster0.lahxp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 exports.default = MongooseDB;
@@ -117,5 +186,11 @@ exports.MongooseDatabase = {
         deleteRoom: MongooseDB.deleteRoom,
         updateRoom: MongooseDB.updateRoom,
     },
-    bookings: {},
+    bookings: {
+        createBookings: MongooseDB.createBooking,
+        getBookingsByUserEmail: MongooseDB.getBookingsByUserEmail,
+        getBookingsByRoomId: MongooseDB.getBookingsByRoomId,
+        deleteBooking: MongooseDB.deleteBooking,
+        updateBooking: MongooseDB.updateBooking,
+    },
 };

@@ -26,13 +26,10 @@ export interface RoomData {
 }
 
 export interface BookingData {
+  bookerUserName: string;
+  bookerEmail: string;
   roomId: string;
-  roomName: string;
-  isActive: boolean;
-  pricePerHour: Number;
-  // dateTime: Date
-  roomCapacity: Number;
-  promoCodes: { [index: string]: number };
+  time: number;
 }
 
 // schemas
@@ -43,6 +40,16 @@ const userDataSchema = new mongoose.Schema(
     isStaff: { type: Boolean, required: true },
     hashedPassword: { type: String, required: true },
     activeAccessToken: String,
+  },
+  { minimize: false }
+);
+
+const BookingDataSchema = new mongoose.Schema(
+  {
+    bookerUserName: { type: String, required: true },
+    bookerEmail: { type: String, required: true },
+    roomId: { type: String, required: true },
+    time: { type: Number, required: true },
   },
   { minimize: false }
 );
@@ -68,4 +75,9 @@ export const UserDataModel = mongoose.model<UserData>(
 export const RoomDataModel = mongoose.model<RoomData>(
   "RoomData",
   roomDataSchema
+);
+
+export const BookingDataModel = mongoose.model<RoomData>(
+  "bookingData",
+  BookingDataSchema
 );

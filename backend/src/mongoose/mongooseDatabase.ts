@@ -1,4 +1,10 @@
-import { RoomData, RoomDataModel, UserDataModel } from "./mongooseSchemas";
+import {
+  RoomData,
+  RoomDataModel,
+  UserDataModel,
+  BookingDataModel,
+  BookingData,
+} from "./mongooseSchemas";
 import mongoose, { mongo } from "mongoose";
 import constants from "../constants";
 import { StatusMessage } from "../utilities";
@@ -79,6 +85,75 @@ export default class MongooseDB {
     // return status
     return { status: "ok", message: `${room.roomName} was updated` };
   }
+
+  static async createBooking(
+    email: string,
+    roomId: string,
+    time: number
+  ): Promise<StatusMessage> {
+    // get user
+    const user = await MongooseDB.getUser(email);
+    console.log(user);
+    if (!user) {
+      throw `user with email ${email} not done`;
+    }
+    //get room
+    const room = await MongooseDB.getRoom(roomId);
+    console.log(room);
+    if (!user) {
+      throw `room with id ${roomId} not done`;
+    }
+    // check for booking collisions
+    const booking = await BookingDataModel.find({ time, roomId });
+    if (booking.length > 0) {
+      console.log("booking", booking);
+      throw "Room is not available at the requested time";
+    }
+    // create booking
+    const newBookingDetails: BookingData = {
+      bookerEmail: user.email,
+      bookerUserName: user.userName,
+      time: time,
+      roomId: room.roomId,
+    };
+    const newDoc = new BookingDataModel(newBookingDetails);
+    await newDoc.save();
+    return {
+      status: "ok",
+      message: `${user.userName} has booked ${room.roomName} at ${time}`,
+      newDoc,
+    };
+  }
+  static async getBookingsByUserEmail(email: string) {
+    return await BookingDataModel.find({ bookerEmail: email });
+  }
+  static async getBookingsByRoomId(roomId: string) {
+    return await BookingDataModel.find({ roomId });
+  }
+  static async deleteBooking(id: string): Promise<StatusMessage> {
+    await BookingDataModel.findByIdAndDelete(id);
+    return { status: "ok", message: "booking deleted" };
+  }
+  static async updateBooking(
+    bookingId: string,
+    changes: BookingData | any
+  ): Promise<StatusMessage> {
+    // get room
+    const booking: BookingData | any = await BookingDataModel.findById(
+      bookingId
+    );
+    if (!booking) {
+      throw "room doesnt exist";
+    }
+    // update all relevant keys
+    const keys = Object.keys(changes);
+    keys.forEach((key) => {
+      booking[key] = changes[key];
+    });
+    await booking.save();
+    // return status
+    return { status: "ok", message: `booking was updated` };
+  }
 }
 
 export const MongooseDatabase = {
@@ -93,5 +168,11 @@ export const MongooseDatabase = {
     deleteRoom: MongooseDB.deleteRoom,
     updateRoom: MongooseDB.updateRoom,
   },
-  bookings: {},
+  bookings: {
+    createBookings: MongooseDB.createBooking,
+    getBookingsByUserEmail: MongooseDB.getBookingsByUserEmail,
+    getBookingsByRoomId: MongooseDB.getBookingsByRoomId,
+    deleteBooking: MongooseDB.deleteBooking,
+    updateBooking: MongooseDB.updateBooking,
+  },
 };
