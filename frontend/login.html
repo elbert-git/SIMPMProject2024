@@ -7,13 +7,102 @@
     <script src="./auth.js" deffered></script>
   </head>
   <body>
-    <h1>test auth</h1>
+    <h1>API Tester</h1>
+    <hr />
+    <h2>Auth status</h2>
+    <div id="authStatus">null</div>
+    <hr />
+    <h2>Login tester</h2>
+    <input id="email" type="text" placeholder="email" />
+    <input id="password" type="text" placeholder="password" />
+    <button id="buttonLogin">log in</button>
+    <button id="buttonLogout">log out</button>
+    <button id="buttonRegister">Register</button>
+    <div>
+      <input id="userName" type="text" placeholder="user name" />
+      <input type="checkbox" name="" id="isStaff" /> <span>is Staff</span>
+    </div>
+    <hr />
+    <h2>Rooms</h2>
+    <button id="buttonGetAllRooms">get all rooms</button>
+    <div id="allRooms">rooms</div>
+    <h3>create room</h3>
+    <div>
+      <textarea name="" id="createRoom" cols="30" rows="10">
+{
+  "roomName": "Room A",
+  "roomCapacity": 10,
+  "pricePerHour": 100,
+  "promoCodes": ["PROMO2024"]
+}
+    </textarea
+      >
+      <button id="buttonCreateRoom">Create room</button>
+    </div>
+    <div>
+      <input type="text" placeholder="id" />
+      <button id="buttonUpdateRoom">update room</button>
+    </div>
+
+    <hr />
+    <h2>Bookings</h2>
+    <button id="buttonGetAllBookings">get all bookings</button>
+    <div id="allBookings">bookings</div>
   </body>
   <script>
-    (async () => {
-      const auth = new Auth();
-      const res = await auth.login("elbert.nathanael@sim.com", "password");
+    // create helper
+    const getEl = (id) => {
+      return document.getElementById(id);
+    };
+    // setup auth
+    const auth = new Auth();
+    if (auth.state.credentials) {
+      console.log(auth.state);
+      getEl("authStatus").innerHTML = JSON.stringify(auth.state.credentials);
+    }
+    auth.onAuthStateChanged = (id) => {
+      getEl("authStatus").innerHTML = JSON.stringify(id);
+    };
+
+    // button events
+    getEl("buttonLogin").addEventListener("click", async () => {
+      const elEmail = getEl("email");
+      const elPass = getEl("password");
+      const res = await auth.login(elEmail.value, elPass.value);
+      elEmail.value = "";
+      elPass.value = "";
       console.log(res);
-    })();
+    });
+    getEl("buttonLogout").addEventListener("click", async () => {
+      auth.logout();
+    });
+    getEl("buttonRegister").addEventListener("click", async () => {
+      const elEmail = getEl("email");
+      const elPass = getEl("password");
+      const elIsStaff = getEl("isStaff");
+      const elUsername = getEl("userName");
+      const res = await auth.register(
+        elEmail.value,
+        elUsername.value,
+        elPass.value,
+        elIsStaff.checked
+      );
+      elEmail.value = "";
+      elPass.value = "";
+      elUsername.value = "";
+      console.log(res);
+    });
+    getEl("buttonGetAllRooms").addEventListener("click", async () => {
+      const res = await auth.getAllRooms();
+      getEl("allRooms").innerHTML = JSON.stringify(res);
+    });
+    getEl("buttonGetAllBookings").addEventListener("click", async () => {
+      const res = await auth.getAllBookings();
+      getEl("allBookings").innerHTML = JSON.stringify(res);
+    });
+    getEl("buttonCreateRoom").addEventListener("click", async () => {
+      console.log(JSON.parse(getEl("createRoom").value));
+      const res = await auth.createRoom(JSON.parse(getEl("createRoom").value));
+    });
   </script>
 </html>

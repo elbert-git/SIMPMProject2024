@@ -3,7 +3,7 @@
 
 POST http://localhost:3000/createRoom
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVsYmVydC5uYXRoYW5hZWxAc2ltLmNvbSIsImlhdCI6MTcyOTQ5MzcwOH0.clq-nyd0Xg6KvtAuGhdqjVxvZBYaTuV12jfwMWBReDo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN0dWRlbnQubmF0aGFuYWVsQHNpbS5jb20iLCJpYXQiOjE3MzA4MTE5MDZ9.3N1HhXYgTfC5aKb0HmlfAX7zfT07hUpwX38dsS_ndec
 
 {
     "roomName": "small room",

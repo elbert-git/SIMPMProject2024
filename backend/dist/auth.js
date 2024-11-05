@@ -45,7 +45,7 @@ class Auth {
             // check if user name exists
             const getUser = yield mongooseDatabase_1.default.getUser(credentials.email);
             if (!getUser) {
-                throw "username doesn't exist";
+                throw "email doesn't exist";
             }
             // match passwords
             const match = yield bcrypt_1.default.compare(credentials.password, getUser.hashedPassword);
@@ -60,6 +60,7 @@ class Auth {
                 return {
                     status: "ok",
                     message: `${credentials.email} is logged in`,
+                    credentials: getUser,
                     accessToken: accessToken,
                 };
             }

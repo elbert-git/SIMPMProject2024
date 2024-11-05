@@ -12,12 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
 const auth_1 = __importDefault(require("./auth"));
 const mongooseDatabase_1 = require("./mongoose/mongooseDatabase");
 const utilities_1 = require("./utilities");
 const expressApp = (0, express_1.default)();
 expressApp.use(express_1.default.json());
+expressApp.use((0, cors_1.default)({
+    origin: '*' // put urls you want here
+}));
 // ---------------------------------- room stuff
 // register
 expressApp.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -49,7 +53,17 @@ expressApp.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
             password: req.body.password,
         };
         const authRes = yield auth_1.default.login(userLogin);
-        res.status(200).json(authRes);
+        // delete sensitive data
+        const cleanedAuthRes = {
+            status: authRes.status,
+            accessToken: authRes.accessToken,
+            credentials: {
+                email: authRes.credentials.email,
+                userName: authRes.credentials.userName,
+                isStaff: authRes.credentials.isStaff,
+            }
+        };
+        res.status(200).json(cleanedAuthRes);
     }
     catch (e) {
         console.log(e);
