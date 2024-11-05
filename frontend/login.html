@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <script src="./auth.js" deffered></script>
+  </head>
+  <body>
+    <h1>test auth</h1>
+  </body>
+  <script>
+    (async () => {
+      const auth = new Auth();
+      const res = await auth.login("elbert.nathanael@sim.com", "password");
+      console.log(res);
+    })();
+  </script>
+</html>
