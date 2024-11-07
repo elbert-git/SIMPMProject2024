@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - UOW Room Booking</title>
+    <style>
+        /* General Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .admin-container {
+            width: 80%;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .button {
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #4b00b1;
+        }
+
+        .room-list {
+            margin-top: 20px;
+        }
+
+        .room-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+
+        .room-item p {
+            margin: 0;
+        }
+
+        .room-item button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .room-item button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Admin Dashboard - Room Management</h1>
+
+    <!-- Room Addition Form -->
+    <div class="admin-container">
+        <h2>Add New Room</h2>
+        <div class="form-group">
+            <label for="room-name">Room Name:</label>
+            <input type="text" id="room-name" placeholder="Enter room name">
+        </div>
+        <div class="form-group">
+            <label for="room-type">Room Type:</label>
+            <input type="text" id="room-type" placeholder="e.g., Small, Medium, Large">
+        </div>
+        <div class="form-group">
+            <label for="room-capacity">Capacity:</label>
+            <input type="number" id="room-capacity" placeholder="Enter room capacity">
+        </div>
+        <div class="form-group">
+            <label for="room-price">Price per Day:</label>
+            <input type="number" id="room-price" placeholder="Enter price per day">
+        </div>
+        <div class="form-group">
+            <label for="promo-code">Promotional Code (Optional):</label>
+            <input type="text" id="promo-code" placeholder="Enter promo code">
+        </div>
+        <button class="button" onclick="addRoom()">Add Room</button>
+    </div>
+
+    <!-- Room List for Editing and Deletion -->
+    <div class="admin-container">
+        <h2>Manage Existing Rooms</h2>
+        <div class="room-list" id="room-list">
+            <!-- Room items will be dynamically generated here -->
+        </div>
+    </div>
+
+    <script>
+        // Load rooms from localStorage on page load
+        window.onload = function() {
+            displayRooms();
+        };
+
+        // Function to add a new room
+        function addRoom() {
+            const roomName = document.getElementById('room-name').value;
+            const roomType = document.getElementById('room-type').value;
+            const roomCapacity = document.getElementById('room-capacity').value;
+            const roomPrice = document.getElementById('room-price').value;
+            const promoCode = document.getElementById('promo-code').value;
+
+            if (!roomName || !roomType || !roomCapacity || !roomPrice) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+
+            const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
+            const newRoom = {
+                name: roomName,
+                type: roomType,
+                capacity: parseInt(roomCapacity),
+                price: parseFloat(roomPrice),
+                promoCode: promoCode
+            };
+            rooms.push(newRoom);
+            localStorage.setItem('rooms', JSON.stringify(rooms));
+
+            // Clear form inputs
+            document.getElementById('room-name').value = '';
+            document.getElementById('room-type').value = '';
+            document.getElementById('room-capacity').value = '';
+            document.getElementById('room-price').value = '';
+            document.getElementById('promo-code').value = '';
+
+            displayRooms();
+        }
+
+        // Function to display all rooms
+        function displayRooms() {
+            const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
+            const roomList = document.getElementById('room-list');
+            roomList.innerHTML = '';
+
+            rooms.forEach((room, index) => {
+                const roomItem = document.createElement('div');
+                roomItem.className = 'room-item';
+                roomItem.innerHTML = `
+                    <p><strong>${room.name}</strong> - ${room.type} | Capacity: ${room.capacity} | Price: $${room.price}/day</p>
+                    <button onclick="deleteRoom(${index})">Delete</button>
+                `;
+                roomList.appendChild(roomItem);
+            });
+        }
+
+        // Function to delete a room
+        function deleteRoom(index) {
+            const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
+            rooms.splice(index, 1);
+            localStorage.setItem('rooms', JSON.stringify(rooms));
+            displayRooms();
+        }
+    </script>
+
+</body>
+</html>

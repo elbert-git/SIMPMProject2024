@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - UOW Room Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .booking-container {
+            width: 80%;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .booking button {
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .booking button:hover {
+            background-color: #333;
+        }
+
+        .modify-dates {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .back-button:hover {
+            background-color: #4b00b1;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Your Bookings</h1>
+    <div class="booking-container" id="booking-container"></div>
+
+    <button class="back-button" onclick="goToHome()">Back to Home</button>
+
+    <script>
+        window.onload = function () {
+            displayBookings();
+        };
+
+        function displayBookings() {
+            const bookings = JSON.parse(localStorage.getItem('userBookings')) || [];
+            const bookingContainer = document.getElementById('booking-container');
+
+            if (bookings.length === 0) {
+                bookingContainer.innerHTML = '<p>No bookings found.</p>';
+                return;
+            }
+
+            bookingContainer.innerHTML = '';
+
+            bookings.forEach((booking, index) => {
+                const bookingDiv = document.createElement('div');
+                bookingDiv.className = 'booking';
+                bookingDiv.innerHTML = `
+                    <p><strong>Room:</strong> ${booking.roomName}</p>
+                    <p><strong>From:</strong> <span id="from-date-${index}">${booking.from}</span></p>
+                    <p><strong>To:</strong> <span id="to-date-${index}">${booking.to}</span></p>
+                    <button onclick="showModifyDates(${index})">Modify Dates</button>
+                    <button onclick="cancelBooking(${index})">Cancel</button>
+
+                    <div class="modify-dates" id="modify-dates-${index}">
+                        <label>From: <input type="date" id="new-from-date-${index}"></label><br><br>
+                        <label>To: <input type="date" id="new-to-date-${index}"></label><br><br>
+                        <button onclick="saveModifiedDates(${index})">Save</button>
+                    </div>
+                `;
+                bookingContainer.appendChild(bookingDiv);
+            });
+        }
+
+        function showModifyDates(index) {
+            const modifyDiv = document.getElementById(`modify-dates-${index}`);
+            modifyDiv.style.display = modifyDiv.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function saveModifiedDates(index) {
+            const newFromDate = document.getElementById(`new-from-date-${index}`).value;
+            const newToDate = document.getElementById(`new-to-date-${index}`).value;
+
+            if (!newFromDate || !newToDate || new Date(newFromDate) >= new Date(newToDate)) {
+                alert('Please enter valid dates.');
+                return;
+            }
+
+            const bookings = JSON.parse(localStorage.getItem('userBookings'));
+            bookings[index].from = newFromDate;
+            bookings[index].to = newToDate;
+            localStorage.setItem('userBookings', JSON.stringify(bookings));
+
+            displayBookings(); // Refresh the bookings display
+        }
+
+        function cancelBooking(index) {
+            const bookings = JSON.parse(localStorage.getItem('userBookings'));
+            bookings.splice(index, 1);
+            localStorage.setItem('userBookings', JSON.stringify(bookings));
+            displayBookings(); // Refresh the bookings display
+        }
+
+        function goToHome() {
+            window.location.href = 'home.html';
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+/* Reset Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header Styling */
+header {
+  background-color: #000;
+  color: white;
+  padding: 10px;
+  text-align: center;
+}
+
+/* Main Content Centering */
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex-grow: 1; /* Ensures the main content fills available space */
+  text-align: center;
+}
+
+/* Welcome Text Styling */
+h2 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+/* Button Styling */
+.buttons {
+  display: flex;
+  gap: 15px; /* Adds space between buttons */
+}
+
+/* .buttons a { */
+.buttons {
+  padding: 10px 20px;
+  background-color: #000;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.buttons a:hover {
+  background-color: #333;
+}
+
+.interactive {
+  pointer-events: auto;
+  cursor: pointer;
+  transition: 0.3s;
+  transform: scale(1);
+}
+.interactive::hover {
+  transform: scale(1.1);
+}
+.interactive::active {
+  transform: scale(0.9);
+}
+
+.column-stack {
+  padding: 1rem;
+  gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+input {
+  padding: 0.5rem;
+}
