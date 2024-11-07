@@ -20,7 +20,7 @@ const utilities_1 = require("./utilities");
 const expressApp = (0, express_1.default)();
 expressApp.use(express_1.default.json());
 expressApp.use((0, cors_1.default)({
-    origin: '*' // put urls you want here
+    origin: "*", // put urls you want here
 }));
 // ---------------------------------- room stuff
 // register
@@ -61,7 +61,7 @@ expressApp.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, functi
                 email: authRes.credentials.email,
                 userName: authRes.credentials.userName,
                 isStaff: authRes.credentials.isStaff,
-            }
+            },
         };
         res.status(200).json(cleanedAuthRes);
     }
@@ -294,7 +294,7 @@ expressApp.post("/createBooking", AuthenticateStudent, (req, res) => __awaiter(v
             .send({ status: "failed", message: error.toString() });
     }
 }));
-expressApp.get("/getBookingsByRoomId", Authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+expressApp.post("/getBookingsByRoomId", Authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const bookings = yield mongooseDatabase_1.MongooseDatabase.bookings.getBookingsByRoomId(req.body.roomId);
         res.status(200).send({ status: "ok", message: "got bookings", bookings });
@@ -305,7 +305,7 @@ expressApp.get("/getBookingsByRoomId", Authenticate, (req, res) => __awaiter(voi
             .send({ status: "failed", message: error.toString() });
     }
 }));
-expressApp.get("/getBookingsByUserEmail", Authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+expressApp.post("/getBookingsByUserEmail", Authenticate, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const bookings = yield mongooseDatabase_1.MongooseDatabase.bookings.getBookingsByUserEmail(req.body.email);
         res.status(200).send({ status: "ok", message: "got bookings", bookings });

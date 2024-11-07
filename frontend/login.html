@@ -26,28 +26,40 @@
     <h2>Rooms</h2>
     <button id="buttonGetAllRooms">get all rooms</button>
     <div id="allRooms">rooms</div>
-    <h3>create room</h3>
     <div>
       <textarea name="" id="createRoom" cols="30" rows="10">
-{
-  "roomName": "Room A",
-  "roomCapacity": 10,
-  "pricePerHour": 100,
-  "promoCodes": ["PROMO2024"]
-}
+        {
+        "roomName": "Room A",
+        "roomCapacity": 10,
+        "pricePerHour": 100,
+        "promoCodes": ["PROMO2024"]
+    }
     </textarea
       >
       <button id="buttonCreateRoom">Create room</button>
     </div>
     <div>
-      <input type="text" placeholder="id" />
+      <input type="text" placeholder="id" id="roomId" />
       <button id="buttonUpdateRoom">update room</button>
+      <button id="buttonDeleteRoom">delete room</button>
     </div>
 
     <hr />
     <h2>Bookings</h2>
-    <button id="buttonGetAllBookings">get all bookings</button>
-    <div id="allBookings">bookings</div>
+    <textarea name="" id="createBooking" cols="30" rows="10">
+        {
+            "email": "",
+            "roomId": "we",
+            "time": "12"
+          }
+    </textarea>
+    <input type="text" placeholder="booking Id" id="bookingId" />
+    <div id="bookings">bookings go here</div>
+    <button id="buttonGetBookingsByUserEmail">get bookings by email</button>
+    <button id="buttonGetBookingsByRoomId">get bookings by room id</button>
+    <button id="buttonCreateBooking">create bookings</button>
+    <button id="buttonUpdateBooking">update bookings</button>
+    <button id="buttonDeleteBooking">delete bookings</button>
   </body>
   <script>
     // create helper
@@ -94,15 +106,51 @@
     });
     getEl("buttonGetAllRooms").addEventListener("click", async () => {
       const res = await auth.getAllRooms();
-      getEl("allRooms").innerHTML = JSON.stringify(res);
-    });
-    getEl("buttonGetAllBookings").addEventListener("click", async () => {
-      const res = await auth.getAllBookings();
-      getEl("allBookings").innerHTML = JSON.stringify(res);
+      getEl("allRooms").innerHTML = JSON.stringify(res, null, 2);
     });
     getEl("buttonCreateRoom").addEventListener("click", async () => {
-      console.log(JSON.parse(getEl("createRoom").value));
       const res = await auth.createRoom(JSON.parse(getEl("createRoom").value));
+    });
+    getEl("buttonDeleteRoom").addEventListener("click", async () => {
+      const res = await auth.deleteRoom(getEl("roomId").value);
+      getEl("roomId").value = "";
+    });
+    getEl("buttonUpdateRoom").addEventListener("click", async () => {
+      const id = getEl("roomId").value;
+      const res = await auth.updateRoom(
+        id,
+        JSON.parse(getEl("createRoom").value)
+      );
+    });
+    getEl("buttonGetBookingsByUserEmail").addEventListener(
+      "click",
+      async () => {
+        console.log("ss");
+        const res = await auth.getBookingsByUserEmail(
+          auth.state.credentials.email
+        );
+        getEl("bookings").innerHTML = JSON.stringify(res, null, 2);
+      }
+    );
+    getEl("buttonGetBookingsByRoomId").addEventListener("click", async () => {
+      const res = await auth.getBookingsByRoomId(getEl("roomId").value);
+      getEl("bookings").innerHTML = JSON.stringify(res, null, 2);
+    });
+    getEl("buttonCreateBooking").addEventListener("click", async () => {
+      const res = await auth.createBooking(
+        JSON.parse(getEl("createBooking").value)
+      );
+    });
+    getEl("buttonDeleteBooking").addEventListener("click", async () => {
+      const res = await auth.deleteBooking(getEl("bookingId").value);
+      console.log(res);
+    });
+    getEl("buttonUpdateBooking").addEventListener("click", async () => {
+      const res = await auth.updateBooking(
+        getEl("bookingId").value,
+        JSON.parse(getEl("createBooking").value)
+      );
+      console.log(res);
     });
   </script>
 </html>
