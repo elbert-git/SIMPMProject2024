@@ -1,5 +1,5 @@
-> room populator
-
+> create add new room button
+> if click add new room ro click on room the editor shows up
 
 
 
@@ -9,3 +9,8 @@ get auth and returnh html
 
 > need to add date to booking schema
 >>> user pages
+
+> create a log out button with header
+
+--- bugs
+adjust available date/time for rooms
