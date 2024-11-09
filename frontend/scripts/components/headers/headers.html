@@ -1,0 +1,40 @@
+<header>
+  <style>
+    header {
+      display: flex;
+      justify-content: space-between;
+      background-color: black;
+      color: white;
+      padding: 0.5em;
+    }
+    .header-right-section {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+    }
+    #logoutButton {
+      background-color: white;
+      color: black;
+    }
+    @media (max-width: 600px) {
+      header {
+        font-size: 0.5rem;
+      }
+      header h1 {
+        display: flex;
+        align-items: center;
+      }
+      header p {
+        display: none;
+      }
+    }
+    .hide {
+      display: none;
+    }
+  </style>
+  <h1>University Of Wollogong</h1>
+  <div class="header-right-section hide">
+    <p>Hi <span id="nameLabel">name</span></p>
+    <button id="logoutButton" class="interactive">Log out</button>
+  </div>
+</header>

@@ -218,11 +218,12 @@
         console.log(context);
       });
 
-      function onEditButtonClicked(id) {
+      async function onEditButtonClicked(id) {
         // get room data
+        const res = await rooms;
         // set context
-        //
-        console.log(id);
+        context.mode = "edit";
+        context.currentRoom = console.log(id);
       }
     </script>
   </body>
