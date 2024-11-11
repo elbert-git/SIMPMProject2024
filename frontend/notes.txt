@@ -1,0 +1,20 @@
+>>> fix room rendering
+
+>>> create edit/new room drawer
+html
+css
+slide up and down
+slide up and down  with context
+create new room functionality
+edit room functionality
+
+
+--- student pages
+>>> render all bookings in 
+
+--- later
+> need to add date to booking schema
+>>> user pages
+>>> fix styles later
+--- bugs
+adjust available date/time for rooms

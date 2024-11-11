@@ -12,23 +12,32 @@ body {
   width: 100%;
 }
 
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+input {
+  padding: 0.5rem;
+}
+
+.header,
+#headerRoot {
   width: 100%;
   background-color: black;
   color: white;
   height: 3rem;
 }
 
-#router {
+#routerRoot {
   height: 100%;
   width: 100%;
   overflow-y: scroll;
+  flex-grow: 1;
 }
 
-button {
+.buttons {
   padding: 0.5em 1em;
   border-radius: 2em;
   border: none;
@@ -45,4 +54,11 @@ button {
 }
 .interactive:active {
   transform: scale(0.9);
+}
+
+/* from old css */
+.column-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

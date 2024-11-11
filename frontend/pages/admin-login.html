@@ -1,0 +1,70 @@
+<style>
+  .login-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+  }
+
+  input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+
+  .button {
+    background-color: #6200ea;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1rem;
+  }
+
+  .button:hover {
+    background-color: #4b00b1;
+  }
+
+  .center {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    padding: 1rem;
+  }
+</style>
+<div class="center">
+  <div class="login-container">
+    <h1>Admin Login</h1>
+    <input
+      type="password"
+      id="admin-password"
+      placeholder="Enter Admin Password"
+    />
+    <button class="button" id="loginButton">Login</button>
+  </div>
+</div>
+
+<script>
+  document.querySelector("#loginButton").addEventListener("click", async () => {
+    console.log("ss");
+    const res = await window.auth.login(
+      "admin@sim.com",
+      document.getElementById("admin-password").value
+    );
+    if (res.status === "ok") {
+      location.reload();
+    } else {
+      console.log(res);
+      alert(res.message);
+    }
+  });
+</script>
