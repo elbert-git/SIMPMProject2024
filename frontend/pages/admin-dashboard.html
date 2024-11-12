@@ -76,6 +76,7 @@
     height: 100%;
     width: 100%;
     pointer-events: none;
+    transition: 0.3s;
   }
   .slider {
     position: fixed;
@@ -88,18 +89,55 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.69);
     padding: 1rem;
     pointer-events: auto;
     transition: 0.3s;
   }
+  .fade {
+    background-color: rgba(0, 0, 0, 0.75);
+  }
   .down {
-    background-color: rgba(0, 0, 0, 0) !important;
     top: 100% !important;
     pointer-events: none !important;
   }
   .admin-container {
     pointer-events: auto;
+    width: 100%;
+    margin: auto 1rem;
+  }
+
+  .column-stack h1 {
+    margin-top: 1rem;
+  }
+
+  .column-stack {
+    padding: 0rem 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .details-container {
+      display: flex;
+      flex-direction: column;
+      height: fit-content !important;
+    }
+    .details-container img {
+      height: auto;
+      width: 100%;
+    }
+  }
+
+  .button {
+    margin-bottom: 0.5rem;
+  }
+  #saveButton {
+    width: 100%;
+    padding: 1rem;
+  }
+  #deleteButton {
+    background-color: rgb(222, 67, 67);
+  }
+  .invisible {
+    display: none !important;
   }
 </style>
 <div class="column-stack">
@@ -119,20 +157,22 @@
 <div class="slider-overlay">
   <div class="slider down">
     <div class="admin-container">
-      <button class="buttons" onclick="toggleSliderDown()">Back</button>
-      <h2>Add New Room</h2>
+      <div class="column-stack">
+        <button class="buttons" onclick="toggleSliderDown()">Back</button>
+      </div>
+      <h2 id="popUpTitle">Add New Room</h2>
       <div class="form-group">
         <label for="room-name">Room Name:</label>
         <input type="text" id="room-name" placeholder="Enter room name" />
       </div>
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label for="room-type">Room Type:</label>
         <input
           type="text"
           id="room-type"
           placeholder="e.g., Small, Medium, Large"
         />
-      </div>
+      </div> -->
       <div class="form-group">
         <label for="room-capacity">Capacity:</label>
         <input
@@ -142,18 +182,35 @@
         />
       </div>
       <div class="form-group">
-        <label for="room-price">Price per Day:</label>
+        <label for="room-price">price per day:</label>
         <input
           type="number"
           id="room-price"
-          placeholder="Enter price per day"
+          placeholder="enter price per day"
         />
       </div>
+      <div class="form-group invisible" id="isActiveParent">
+        <label for="room-price">Available for booking</label>
+        <input type="checkbox" id="isActive" />
+      </div>
       <div class="form-group">
-        <label for="promo-code">Promotional Code (Optional):</label>
+        <label for="promo-code"
+          >Promotional Code (use comma to separate values):</label
+        >
         <input type="text" id="promo-code" placeholder="Enter promo code" />
       </div>
-      <button class="button" onclick="addRoom()">Add Room</button>
+      <div class="column-stack">
+        <button class="button" onclick="onSaveButtonClicked()" id="saveButton">
+          Save
+        </button>
+        <button
+          class="button invisible"
+          onclick="onDeleteButtonClicked()"
+          id="deleteButton"
+        >
+          delete
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -162,11 +219,11 @@
   // initialise auth
   if (window.auth.state.credentials === undefined) {
     alert("Not logged in as admin, redirecting back to home");
-    window.location.href = "/";
+    location.reload();
   }
   if (!window.auth.state.credentials.isStaff) {
     alert("Not logged in as admin, redirecting back to home");
-    window.location.href = "/";
+    location.reload();
   }
 
   // render rooms
@@ -175,23 +232,136 @@
   // handle event callbacks
   function toggleSliderDown() {
     document.querySelector(".slider").classList.add("down");
+    document.querySelector(".slider-overlay").classList.remove("fade");
+    context.popUpMode = "";
+    context.currentRoom = null;
+    // show hide dlete button
+    document.getElementById("deleteButton").classList.add("invisible");
+    // show hide the is active checkbox
+    document.getElementById("isActiveParent").classList.add("invisible");
   }
   function toggleSliderUp() {
     document.querySelector(".slider").classList.remove("down");
+    document.querySelector(".slider-overlay").classList.add("fade");
   }
 
-  let context = {};
+  const context = {
+    rooms: window.auth.getAllRooms(),
+    popUpMode: "",
+    currentRoom: undefined,
+  };
 
+  // on clicked new room button
   document.getElementById("addNewRoom").addEventListener("click", () => {
     toggleSliderUp();
-    console.log(context);
+    context.popUpMode = "create";
+    //  edit text elements
+    document.querySelector("#popUpTitle").innerHTML = `Add a new room`;
+    // popullate fields
+    document.querySelector("input#room-name").value = "";
+    document.querySelector("#room-capacity").value = "";
+    document.querySelector("#room-price").value = "";
+    document.querySelector("#promo-code").value = "";
   });
 
+  // on clicked edit button
   async function onEditButtonClicked(id) {
-    // get room data
-    const res = await rooms;
-    // set context
-    context.mode = "edit";
-    context.currentRoom = console.log(id);
+    // // get room data
+    const res = await window.auth.getAllRooms();
+    const roomData = res.rooms.find((room) => room.roomId === id);
+    console.log(roomData);
+    context.popUpMode = "edit";
+    context.currentRoom = roomData.roomId;
+    // toggle slide up
+    toggleSliderUp();
+    //  edit text elements
+    document.querySelector(
+      "#popUpTitle"
+    ).innerHTML = `Editing: ${roomData.roomName}`;
+    // popullate fields
+    document.querySelector("input#room-name").value = roomData.roomName;
+    document.querySelector("#room-capacity").value = roomData.roomCapacity;
+    document.querySelector("#room-price").value = roomData.pricePerHour;
+    document.querySelector("#promo-code").value =
+      roomData.promoCodes.toString();
+    if (roomData.isActive) {
+      document.querySelector("#isActive").checked = true;
+    } else {
+      document.querySelector("#isActive").checked = false;
+    }
+    roomData.promoCodes.toString();
+    // show delete button
+    document.getElementById("deleteButton").classList.remove("invisible");
+    // show hide the is active checkbox
+    document.getElementById("isActiveParent").classList.remove("invisible");
+  }
+
+  async function onSaveButtonClicked() {
+    // get fields
+    const roomName = document.querySelector("input#room-name").value;
+    const roomCapacity = document.querySelector("#room-capacity").value;
+    const pricePerHour = document.querySelector("#room-price").value;
+    const promoCodes = document.querySelector("#promo-code").value;
+    const isActive = document.querySelector("#isActive").checked;
+    [(roomName, roomCapacity, pricePerHour, promoCodes)].forEach((element) => {
+      if (element === "") {
+        alert("not all fields are filled");
+        throw "not all fields are filled";
+      }
+    });
+    // check fields
+    [roomCapacity, pricePerHour].forEach((element) => {
+      if (!isNumber(element)) {
+        alert("room capacity or price per hour is not a number");
+        throw "not all fields are filled";
+      }
+    });
+    // if mode is create
+    if (context.popUpMode === "create") {
+      console.log("saving new room to server");
+      const res = await window.auth.createRoom({
+        roomName,
+        roomCapacity,
+        pricePerHour,
+        promoCodes: promoCodes.split(","),
+      });
+      if (res.status === "ok") {
+        alert("room has been created");
+        location.reload();
+      } else {
+        alert("somethign went wrong");
+      }
+    }
+    // if mode is edit
+    if (context.popUpMode === "edit") {
+      console.log("saving edits to server");
+      console.log(isActive);
+      const res = await window.auth.updateRoom(context.currentRoom, {
+        roomName,
+        roomCapacity,
+        pricePerHour,
+        promoCodes: promoCodes.split(","),
+        isActive: isActive,
+      });
+      if (res.status === "ok") {
+        alert("room has been saved");
+        location.reload();
+      } else {
+        alert("somethign went wrong");
+      }
+    }
+  }
+  async function onDeleteButtonClicked() {
+    const res = await window.auth.deleteRoom(context.currentRoom);
+    if (res.status === "ok") {
+      alert("room has been deleted");
+      location.reload();
+    } else {
+      alert("somethign went wrong");
+    }
+  }
+  // utilities
+  function isNumber(value) {
+    return /^-?\d+(\.\d+)?$/.test(value);
   }
 </script>

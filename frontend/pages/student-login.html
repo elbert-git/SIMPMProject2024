@@ -8,11 +8,13 @@
     border: 1px black solid;
   }
 </style>
+
 <main class="column-stack">
   <input type="email" id="login-email" placeholder="Email" required />
   <input type="password" id="login-password" placeholder="Password" required />
   <button id="loginButton" class="buttons">Login</button>
 </main>
+
 <script>
   document.getElementById("loginButton").addEventListener("click", async () => {
     const res = await window.auth.login(
@@ -20,7 +22,7 @@
       document.getElementById("login-password").value
     );
     if (res.status === "ok") {
-      window.router.go("./pages/student-home.html");
+      window.router.go("./pages/student-dashboard.html");
     } else {
       alert(res.message);
     }

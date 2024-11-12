@@ -1,16 +1,11 @@
->>> fix room rendering
-
->>> create edit/new room drawer
-html
-css
-slide up and down
-slide up and down  with context
-create new room functionality
-edit room functionality
-
 
 --- student pages
->>> render all bookings in 
+>>> create
+create slider
+
+>>> read
+>>> delete
+>>> update
 
 --- later
 > need to add date to booking schema

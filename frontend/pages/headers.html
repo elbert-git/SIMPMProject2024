@@ -36,9 +36,7 @@
       display: none;
     }
   </style>
-  <h1 onclick="window.router.go('./pages/home.html')">
-    University Of Wollogong
-  </h1>
+  <h1 onclick="location.reload()">University Of Wollogong</h1>
   <div class="header-right-section hide">
     <p>Hi <span id="nameLabel">name</span></p>
     <button id="logoutButton" class="interactive buttons">Log out</button>
@@ -47,17 +45,15 @@
 
 <script>
   // get auth
-  const auth = window.auth;
-  const credentials = auth.state.credentials;
-  console.log(auth);
   // toggle visibility based on auth state
-  if (credentials) {
+  if (window.auth.state.credentials) {
     document.querySelector(".header-right-section").classList.remove("hide");
-    document.querySelector("#nameLabel").innerHTML = credentials.userName;
+    document.querySelector("#nameLabel").innerHTML =
+      window.auth.state.credentials.userName;
   }
   document.getElementById("logoutButton").addEventListener("click", () => {
     // logout
-    auth.logout();
+    window.auth.logout();
     // referesh
     location.reload();
   });
