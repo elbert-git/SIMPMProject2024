@@ -1,7 +1,15 @@
 
 --- student pages
 >>> create
-create slider
+> create room selector
+create selection display html
+render selector on fetch
+on select update display
+> create date selector
+on selecttion add date to dislay
+> create time selector
+ons election add time to display
+> on save button 
 
 >>> read
 >>> delete
