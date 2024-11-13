@@ -132,7 +132,7 @@ async function renderBookings(parentElement) {
                 margin: 1rem;
             }
             .booking-card img{
-                height: 100%
+                height: 100%; border-radius: 0.5rem;
             }
             .booking-details{
                 flex-grow: 1;
@@ -145,6 +145,13 @@ async function renderBookings(parentElement) {
                 margin-top: 0.5rem;
                 width: 100%;
             }
+                @media (max-width: 600px) {
+                    .booking-card {
+                        flex-direction: column;
+                        height: fit-content;
+                    }
+                    img { width: 100%; height: auto !important; }
+                }
         </style> 
     `
     bookings.forEach((booking) => {

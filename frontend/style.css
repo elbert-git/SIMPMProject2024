@@ -83,3 +83,8 @@ input {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #a8bbbf;
 }
+
+.page-title {
+  margin: 1rem auto 0.5rem auto;
+  font-size: 2rem;
+}

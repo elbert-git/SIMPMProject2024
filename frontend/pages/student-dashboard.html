@@ -6,6 +6,7 @@
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
   }
 
   .booking {
@@ -123,11 +124,25 @@
   #timeSelector option:disabled{
     color: rgb(207, 207, 207);
   }
+
+  #newBookingButton{
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 600px;
+    height: 2rem;
+  }
+
+  .main{
+    width: 100vw;
+    padding: 1rem;
+  }
+
+
 </style>
 
-<div class="column-stack">
-  <h1>Your Bookings</h1>
-  <button class="buttons" onclick="newBookingButtonClicked()">
+<div class="column-stack main">
+  <h1 class="page-title">Your Bookings</h1>
+  <button class="buttons" onclick="newBookingButtonClicked()" id="newBookingButton">
     Book a room
   </button>
   <div class="booking-container" id="booking-container"></div>
