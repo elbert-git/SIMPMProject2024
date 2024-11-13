@@ -102,7 +102,7 @@ class MongooseDB {
             return { status: "ok", message: `${room.roomName} was updated` };
         });
     }
-    static createBooking(email, roomId, time) {
+    static createBooking(email, roomId, time, date) {
         return __awaiter(this, void 0, void 0, function* () {
             // get user
             const user = yield MongooseDB.getUser(email);
@@ -117,9 +117,8 @@ class MongooseDB {
                 throw `room with id ${roomId} not done`;
             }
             // check for booking collisions
-            const booking = yield mongooseSchemas_1.BookingDataModel.find({ time, roomId });
+            const booking = yield mongooseSchemas_1.BookingDataModel.find({ time, roomId, date });
             if (booking.length > 0) {
-                console.log("booking", booking);
                 throw "Room is not available at the requested time";
             }
             // create booking
@@ -128,6 +127,7 @@ class MongooseDB {
                 bookerUserName: user.userName,
                 time: time,
                 roomId: room.roomId,
+                date: date
             };
             const newDoc = new mongooseSchemas_1.BookingDataModel(newBookingDetails);
             yield newDoc.save();

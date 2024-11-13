@@ -189,6 +189,22 @@
           placeholder="enter price per day"
         />
       </div>
+      <div class="form-group">
+        <label for="roomEarliestBookingTime">Earliest booking time:</label>
+        <input
+          type="number"
+          id="roomEarliestBookingTime"
+          placeholder="earliest booking time"
+        />
+      </div>
+      <div class="form-group">
+        <label for="roomLatestBookingTime">Latest booking time:</label>
+        <input
+          type="number"
+          id="roomLatestBookingTime"
+          placeholder="latest booking time"
+        />
+      </div>
       <div class="form-group invisible" id="isActiveParent">
         <label for="room-price">Available for booking</label>
         <input type="checkbox" id="isActive" />
@@ -282,6 +298,10 @@
     document.querySelector("input#room-name").value = roomData.roomName;
     document.querySelector("#room-capacity").value = roomData.roomCapacity;
     document.querySelector("#room-price").value = roomData.pricePerHour;
+    document.querySelector("#roomEarliestBookingTime").value =
+      roomData.earliestBookingTime;
+    document.querySelector("#roomLatestBookingTime").value =
+      roomData.latestBookingTime;
     document.querySelector("#promo-code").value =
       roomData.promoCodes.toString();
     if (roomData.isActive) {
@@ -303,6 +323,12 @@
     const pricePerHour = document.querySelector("#room-price").value;
     const promoCodes = document.querySelector("#promo-code").value;
     const isActive = document.querySelector("#isActive").checked;
+    const earliestBookingTime = document.querySelector(
+      "#roomEarliestBookingTime"
+    ).value;
+    const latestBookingTime = document.querySelector(
+      "#roomLatestBookingTime"
+    ).value;
     [(roomName, roomCapacity, pricePerHour, promoCodes)].forEach((element) => {
       if (element === "") {
         alert("not all fields are filled");
@@ -310,12 +336,27 @@
       }
     });
     // check fields
-    [roomCapacity, pricePerHour].forEach((element) => {
+    [
+      roomCapacity,
+      pricePerHour,
+      earliestBookingTime,
+      latestBookingTime,
+    ].forEach((element) => {
       if (!isNumber(element)) {
         alert("room capacity or price per hour is not a number");
         throw "not all fields are filled";
       }
     });
+    // check booking times
+    if (Number(earliestBookingTime) < 0) {
+      alert("earliest booking time cannot be less than 0");
+      throw "earliest booking time cannot be less than 0";
+    }
+    // check booking times
+    if (Number(latestBookingTime) > 24) {
+      alert("earliest booking time cannot be greater than 24");
+      throw "earliest booking time cannot be greater than 24";
+    }
     // if mode is create
     if (context.popUpMode === "create") {
       console.log("saving new room to server");
@@ -324,6 +365,8 @@
         roomCapacity,
         pricePerHour,
         promoCodes: promoCodes.split(","),
+        latestBookingTime,
+        earliestBookingTime,
       });
       if (res.status === "ok") {
         alert("room has been created");
@@ -342,6 +385,8 @@
         pricePerHour,
         promoCodes: promoCodes.split(","),
         isActive: isActive,
+        latestBookingTime,
+        earliestBookingTime,
       });
       if (res.status === "ok") {
         alert("room has been saved");

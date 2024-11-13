@@ -18,6 +18,7 @@ const BookingDataSchema = new mongoose_1.default.Schema({
     bookerEmail: { type: String, required: true },
     roomId: { type: String, required: true },
     time: { type: Number, required: true },
+    date: { type: String, required: true } // yyyy/mm/dd
 }, { minimize: false });
 const roomDataSchema = new mongoose_1.default.Schema({
     roomId: { type: String, required: true, unique: true },
@@ -26,6 +27,8 @@ const roomDataSchema = new mongoose_1.default.Schema({
     pricePerHour: { type: Number, required: true },
     roomCapacity: { type: String, required: true },
     promoCodes: { type: Object, required: true },
+    earliestBookingTime: { type: Number, required: true },
+    latestBookingTime: { type: Number, required: true },
 }, { minimize: false });
 // models
 exports.UserDataModel = mongoose_1.default.model("UserData", userDataSchema);

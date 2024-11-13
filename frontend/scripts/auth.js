@@ -1,6 +1,6 @@
 class Auth {
-    static baseUrl = "http://192.53.113.254:3000";
-    // static baseUrl = "http://localhost:3000";
+    // static baseUrl = "http://192.53.113.254:3000";
+    static baseUrl = "http://localhost:3000";
     static localStorageKey = "sim-pm-auth";
     constructor() {
         // initialise aith
@@ -189,7 +189,6 @@ class Auth {
                 }),
             });
             const resJson = await res.json();
-            console.log(resJson);
             return resJson;
         } catch (error) {
             console.log(error);

@@ -1,23 +1,5 @@
 
---- student pages
->>> create
-> create room selector
-create selection display html
-render selector on fetch
-on select update display
-> create date selector
-on selecttion add date to dislay
-> create time selector
-ons election add time to display
-> on save button 
 
->>> read
->>> delete
->>> update
 
 --- later
-> need to add date to booking schema
->>> user pages
 >>> fix styles later
---- bugs
-adjust available date/time for rooms

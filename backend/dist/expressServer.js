@@ -207,6 +207,8 @@ expressApp.post("/createRoom", AuthenticateStaff, (req, res) => __awaiter(void 0
             isActive: false,
             pricePerHour: req.body.pricePerHour,
             promoCodes: req.body.promoCodes,
+            earliestBookingTime: req.body.earliestBookingTime,
+            latestBookingTime: req.body.latestBookingTime
         };
         const result = yield mongooseDatabase_1.MongooseDatabase.rooms.createRoom(roomDetails);
         res
@@ -283,7 +285,7 @@ expressApp.post("/createBooking", AuthenticateStudent, (req, res) => __awaiter(v
         if (getUser.isStaff !== false) {
             throw "User is not authorized to do this action";
         }
-        const result = yield mongooseDatabase_1.MongooseDatabase.bookings.createBookings(req.body.email, req.body.roomId, req.body.time);
+        const result = yield mongooseDatabase_1.MongooseDatabase.bookings.createBookings(req.body.email, req.body.roomId, req.body.time, req.body.date);
         res
             .status(200)
             .send({ status: "ok", message: "booking was created", result });

@@ -119,18 +119,22 @@
     padding: 0.5rem;
     margin: 1rem;
   }
+
+  #timeSelector option:disabled{
+    color: rgb(207, 207, 207);
+  }
 </style>
 
 <div class="column-stack">
   <h1>Your Bookings</h1>
-  <button class="buttons" onclick="newBookingButtonCreated()">
+  <button class="buttons" onclick="newBookingButtonClicked()">
     Book a room
   </button>
   <div class="booking-container" id="booking-container"></div>
   </div>
 </div>
 
-<div class="slider-overlay">
+<div class="slider-overlay down">
   <div class="slider column-stack">
     <div class="card column-stack">
       <button class="buttons" id="backButon" onclick="toggleDown()">
@@ -142,10 +146,10 @@
       <div class="room-display">
         <img src="assets/meetingRoom.jpg" alt="" />
         <div class="room-display-details">
-          <h3 id="roomName">room name</h3>
-          <div><strong>Capacity</strong>: <span id="capacity">300</span></div>
+          <h3 id="roomName">---</h3>
+          <div><strong>Capacity</strong>: <span id="roomCapacity">---</span></div>
           <div>
-            <strong>Rent per hour</strong>: $ <span id="costPerHour">300</span>
+            <strong>Rent per hour</strong>: $<span id="costPerHour">---</span>
           </div>
         </div>
       </div>
@@ -158,18 +162,16 @@
 
       <!-- date selector -->
       <h2>Set a date</h2>
-      <input type="date" id="birthday" name="birthday" />
+      <input type="date" id="dateSelector" />
       <!-- time selector -->
       <h2>Set a time</h2>
       <p>Every booking is an hour</p>
       <select name="" id="timeSelector">
         <option value="d">room name</option>
-        <option value="d">room name</option>
-        <option value="d">room name</option>
-        <option value="d">room name</option>
       </select>
       <!-- payment -->
       <h2>Payment</h2>
+      <p>Every booking creation or edit is a new payment</p>
     <div class="payment-container column-stack">
         <input type="text" placeholder="Card Number">
         <input type="text" placeholder="MM/YY">
@@ -177,94 +179,238 @@
         <input type="text" placeholder="Promo Code (Optional)">
     </div>
       <!-- Pay and save -->
-      <p>Every booking edit is a new payment</p>
-      <button class="buttons">Make Payment and Create</button>
+      <button class="buttons" id="saveButton">Save</button>
+      <!-- delete -->
+      <button class="buttons hide" id="deleteButton">Delete</button>
     </div>
   </div>
 </div>
 
 <script>
+    const context = {
+        rooms: [],
+        currentRoom: null,
+        currentBooking: null,
+        currentMode: "",
+        bookings: [],
+    }
+    // on start render rooms in select
+    const onStart = async ()=>{
+        // clear select tag
+        const selectTag = document.getElementById("roomSelector")
+        selectTag.innerHTML = `<option value="" disabled selected>Select a room</option>`
+        // get rooms
+        const res = await window.auth.getAllRooms()
+        const rooms = res.rooms
+        context.rooms = rooms
+        // add rooms 
+        rooms.forEach(room => {
+            if(room.isActive){
+                const option = document.createElement("option")
+                option.innerHTML = room.roomName
+                option.value = room.roomId
+                selectTag.appendChild(option) 
+            }
+        });
+        // setup time selector
+        const timeSelector = document.getElementById("timeSelector")
+        timeSelector.innerHTML = `<option value="" disabled selected>Select a time</option>`
+        for (let index = 0; index < 24; index++) {
+                const option = document.createElement("option")
+                option.innerHTML = index.toString().padStart(2, '0') + ":00"
+                option.disabled = true
+                option.value = index
+                timeSelector.appendChild(option) 
+        }
+        // render current bookings
+        window.render.renderBookings(document.getElementById('booking-container'))
+        // setup bookings context
+        const bookingRes = await window.auth.getBookingsByUserEmail(window.auth.state.credentials.email)
+        context.bookings = bookingRes.bookings
+    }
+    onStart()
   // event callbacks
+  const selectTag = document.getElementById("roomSelector")
+  selectTag.addEventListener('change', ()=>{
+    // get selected room
+    const choiceId = selectTag.options[selectTag.selectedIndex].value
+    context.currentRoom = context.rooms.find(room => room.roomId === choiceId)
+    // show current selected room
+    document.getElementById("roomName").innerHTML = context.currentRoom.roomName
+    document.getElementById("costPerHour").innerHTML = context.currentRoom.pricePerHour
+    document.getElementById("roomCapacity").innerHTML = context.currentRoom.roomCapacity
+    // set time
+    const timeSelector = document.getElementById("timeSelector")
+    for (let index = 0; index < timeSelector.options.length; index++) {
+        // ignore first option
+        if(index === 0){ continue; }
+        // disable times too early
+        if(index-1 < context.currentRoom.earliestBookingTime){
+            timeSelector.options[index].disabled = true
+        }else{
+            timeSelector.options[index].disabled = false
+        }
+        if(index-1 > context.currentRoom.latestBookingTime){
+            timeSelector.options[index].disabled = true
+        }else{
+            timeSelector.options[index].disabled = false
+        }
+    }
+  })
+  document.getElementById("saveButton").addEventListener('click', async ()=>{
+    // prevent no room selected
+    if(!context.currentRoom){
+        alert("no room selected");
+        throw "no room selected"
+    }
+    // get fields
+    const date = document.getElementById('dateSelector').value || null
+    const time = document.getElementById("timeSelector").options[document.getElementById("timeSelector").selectedIndex].value || null
+    const roomId = context.currentRoom.roomId || null;
+    const email = window.auth.state.credentials.email || null;
+    // verify fields
+    [date, time, roomId, email].forEach((field)=>{
+        console.log(field)
+        if(field === null || field === undefined){
+            alert("some fields are empty");
+            throw "some fields are empty"
+        }
+    })
+    if(!isTodayOrFutureDate(date)){
+        alert("Date is in the past")
+        throw "Date is in the past"
+    }
+    // branch based on mode to create or update
+    if(context.currentMode === "create"){
+        const res = await window.auth.createBooking({
+            date,time,roomId,email
+        })
+        if(res.status === "ok"){
+            alert("Booking created!")
+            location.reload()
+        }else{
+            alert(res.message)
+        }
+    }else{
+        const res = await window.auth.updateBooking(context.currentBooking._id, {
+            date,time,roomId,email
+        })
+        if(res.status === "ok"){
+            alert("Booking edited!")
+            location.reload()
+        }else{
+            alert(res.message)
+        }
+    }
+    // save fields based on action
+  })
+  function onEditButtonPressed(id){
+    // toggle up
+    toggleUp()
+    // set mode to update
+    context.currentMode = "update"
+    // set contexts
+    context.currentBooking = context.bookings.find(book => book._id === id)
+    context.currentRoom = context.rooms.find(room => room.roomId === context.currentBooking.roomId)
+    console.log(context)
+    // populate room display
+    document.getElementById("roomName").innerHTML = context.currentRoom.roomName
+    document.getElementById("costPerHour").innerHTML = context.currentRoom.pricePerHour
+    document.getElementById("roomCapacity").innerHTML = context.currentRoom.roomCapacity
+    // populate ui fields
+    // room selector
+    const roomSelector = document.getElementById('roomSelector')
+    for (let index = 1; index < roomSelector.options.length; index++) {
+        const option = roomSelector.options[index]
+        if(option.value === context.currentRoom.roomId){
+            option.selected = true;
+            break;
+        }
+    }
+    // show delete button
+    document.getElementById("deleteButton").classList.remove('hide')
+    // date selector
+    document.getElementById("dateSelector").value = context.currentBooking.date
+    // time selector
+    const timeSelector= document.getElementById('timeSelector')
+    // make time available as per limits
+    for (let index = 0; index < timeSelector.options.length; index++) {
+        // ignore first option
+        if(index === 0){ continue; }
+        // disable times too early
+        if(index-1 < context.currentRoom.earliestBookingTime){
+            timeSelector.options[index].disabled = true
+        }else{
+            timeSelector.options[index].disabled = false
+        }
+        if(index-1 > context.currentRoom.latestBookingTime){
+            timeSelector.options[index].disabled = true
+        }else{
+            timeSelector.options[index].disabled = false
+        }
+    }
+    // select correct time
+    for (let index = 1; index < timeSelector.options.length; index++) {
+        const option = timeSelector.options[index]
+        if(option.value.toString() === context.currentBooking.time.toString()){
+            option.selected = true;
+            break;
+        }
+    }
+  }
+  document.getElementById("deleteButton").addEventListener('click', async ()=>{
+    const res = await window.auth.deleteBooking(context.currentBooking._id)
+    if(res.status === "ok"){
+        alert("Booking Deleted")
+        location.reload()
+    }else{
+        alert(res.message)
+    }
+  })
   function toggleUp() {
     document.querySelector(".slider-overlay").classList.remove("down");
   }
   function toggleDown() {
     document.querySelector(".slider-overlay").classList.add("down");
+    // clear context 
+    context.currentRoom = null
+    context.currentBooking = null
+    context.currentMode = ""
+    // clear current selected room display
+    document.getElementById("roomName").innerHTML = "---"
+    document.getElementById("costPerHour").innerHTML = "---"
+    document.getElementById("roomCapacity").innerHTML = "---"
+    // clear fields
+    document.getElementById("roomSelector").options[0].selected = true
+    document.getElementById("timeSelector").options[0].selected = true
+    document.getElementById("dateSelector").value = ""
+    // remove delete button
+    document.getElementById("deleteButton").classList.add('hide')
   }
-  function newBookingButtonCreated() {
+  function newBookingButtonClicked() {
+    // toggle up
     toggleUp();
+    // set mode to create
+    context.currentMode = "create"
   }
 
   window.onload = function () {
     displayBookings();
   };
 
-  function displayBookings() {
-    const bookings = JSON.parse(localStorage.getItem("userBookings")) || [];
-    const bookingContainer = document.getElementById("booking-container");
-
-    if (bookings.length === 0) {
-      bookingContainer.innerHTML = "<p>No bookings found.</p>";
-      return;
-    }
-
-    bookingContainer.innerHTML = "";
-
-    bookings.forEach((booking, index) => {
-      const bookingDiv = document.createElement("div");
-      bookingDiv.className = "booking";
-      bookingDiv.innerHTML = `
-                    <p><strong>Room:</strong> ${booking.roomName}</p>
-                    <p><strong>From:</strong> <span id="from-date-${index}">${booking.from}</span></p>
-                    <p><strong>To:</strong> <span id="to-date-${index}">${booking.to}</span></p>
-                    <button onclick="showModifyDates(${index})">Modify Dates</button>
-                    <button onclick="cancelBooking(${index})">Cancel</button>
-
-                    <div class="modify-dates" id="modify-dates-${index}">
-                        <label>From: <input type="date" id="new-from-date-${index}"></label><br><br>
-                        <label>To: <input type="date" id="new-to-date-${index}"></label><br><br>
-                        <button onclick="saveModifiedDates(${index})">Save</button>
-                    </div>
-                `;
-      bookingContainer.appendChild(bookingDiv);
-    });
-  }
-
-  function showModifyDates(index) {
-    const modifyDiv = document.getElementById(`modify-dates-${index}`);
-    modifyDiv.style.display =
-      modifyDiv.style.display === "none" ? "block" : "none";
-  }
-
-  function saveModifiedDates(index) {
-    const newFromDate = document.getElementById(`new-from-date-${index}`).value;
-    const newToDate = document.getElementById(`new-to-date-${index}`).value;
-
-    if (
-      !newFromDate ||
-      !newToDate ||
-      new Date(newFromDate) >= new Date(newToDate)
-    ) {
-      alert("Please enter valid dates.");
-      return;
-    }
-
-    const bookings = JSON.parse(localStorage.getItem("userBookings"));
-    bookings[index].from = newFromDate;
-    bookings[index].to = newToDate;
-    localStorage.setItem("userBookings", JSON.stringify(bookings));
-
-    displayBookings(); // Refresh the bookings display
-  }
-
-  function cancelBooking(index) {
-    const bookings = JSON.parse(localStorage.getItem("userBookings"));
-    bookings.splice(index, 1);
-    localStorage.setItem("userBookings", JSON.stringify(bookings));
-    displayBookings(); // Refresh the bookings display
-  }
-
   function goToHome() {
     window.location.href = "home.html";
   }
+
+  // utility
+    function isTodayOrFutureDate(dateString) {
+            // Parse the date string as yyyy/mm/dd
+            const inputDate = new Date(dateString);
+            const today = new Date();
+            // Set both dates' time to midnight to compare only dates
+            inputDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+
+            return inputDate >= today;
+    }
 </script>
