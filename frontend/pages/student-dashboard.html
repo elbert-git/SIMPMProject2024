@@ -137,7 +137,13 @@
     padding: 1rem;
   }
 
+  .payment-container input{
+    margin-top: 1rem;
+  }
 
+  #saveButton, #deleteButon{
+    margin-top: 1rem;
+  }
 </style>
 
 <div class="column-stack main">
@@ -188,9 +194,9 @@
       <h2>Payment</h2>
       <p>Every booking creation or edit is a new payment</p>
     <div class="payment-container column-stack">
-        <input type="text" placeholder="Card Number">
-        <input type="text" placeholder="MM/YY">
-        <input type="text" placeholder="CVC">
+        <input placeholder="Card Number" type="tel" inputmode="numeric" pattern="[0-9\s]{13,19}" autocomplete="cc-number" maxlength="19">
+        <input type="numeric" placeholder="MM/YY" maxlength="5">
+        <input type="numeric" placeholder="CVC" maxlength="3">
         <input type="text" placeholder="Promo Code (Optional)">
     </div>
       <!-- Pay and save -->
@@ -417,15 +423,15 @@
     window.location.href = "home.html";
   }
 
-  // utility
+    // utility
     function isTodayOrFutureDate(dateString) {
-            // Parse the date string as yyyy/mm/dd
-            const inputDate = new Date(dateString);
-            const today = new Date();
-            // Set both dates' time to midnight to compare only dates
-            inputDate.setHours(0, 0, 0, 0);
-            today.setHours(0, 0, 0, 0);
+        // Parse the date string as yyyy/mm/dd
+        const inputDate = new Date(dateString);
+        const today = new Date();
+        // Set both dates' time to midnight to compare only dates
+        inputDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
 
-            return inputDate >= today;
+        return inputDate >= today;
     }
 </script>

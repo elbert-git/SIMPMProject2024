@@ -18,7 +18,7 @@ expressApp.use(
     })
 );
 
-expressApp.use(express.static('./public'));
+expressApp.use('/', express.static('./public'));
 
 // ---------------------------------- room stuff
 // register

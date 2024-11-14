@@ -38,5 +38,4 @@ class Router {
         "./pages/headers.html",
         document.getElementById("headerRoot")
     );
-    // todo initialise drawer
 })();
