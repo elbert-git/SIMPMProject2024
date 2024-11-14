@@ -22,6 +22,7 @@ expressApp.use(express_1.default.json());
 expressApp.use((0, cors_1.default)({
     origin: "*", // put urls you want here
 }));
+expressApp.use(express_1.default.static('./public'));
 // ---------------------------------- room stuff
 // register
 expressApp.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {

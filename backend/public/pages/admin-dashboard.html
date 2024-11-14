@@ -1,0 +1,412 @@
+<style>
+  .admin-container {
+    width: 80%;
+    max-width: 800px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  input[type="text"],
+  input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+
+  .button {
+    background-color: #6200ea;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .button:hover {
+    background-color: #4b00b1;
+  }
+
+  .room-list {
+    margin-top: 20px;
+  }
+
+  .room-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+  }
+
+  .room-item p {
+    margin: 0;
+  }
+
+  .room-item button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .room-item button:hover {
+    background-color: #d32f2f;
+  }
+
+  .slider-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+    transition: 0.3s;
+  }
+  .slider {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1rem;
+    pointer-events: auto;
+    transition: 0.3s;
+  }
+  .fade {
+    background-color: rgba(0, 0, 0, 0.75);
+  }
+  .down {
+    top: 100% !important;
+    pointer-events: none !important;
+  }
+  .admin-container {
+    pointer-events: auto;
+    width: 100%;
+    margin: auto 1rem;
+  }
+
+  .column-stack h1 {
+    margin-top: 1rem;
+  }
+
+  .column-stack {
+    padding: 0rem 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .details-container {
+      display: flex;
+      flex-direction: column;
+      height: fit-content !important;
+    }
+    .details-container img {
+      height: auto;
+      width: 100%;
+    }
+  }
+
+  .button {
+    margin-bottom: 0.5rem;
+  }
+  #saveButton {
+    width: 100%;
+    padding: 1rem;
+  }
+  #deleteButton {
+    background-color: rgb(222, 67, 67);
+  }
+  .invisible {
+    display: none !important;
+  }
+</style>
+<div class="column-stack">
+  <h1>Room Management</h1>
+
+  <button class="buttons" id="addNewRoom">Add new room</button>
+  <!-- Room List for Editing and Deletion -->
+  <div class="admin-container">
+    <h2>Existing Rooms</h2>
+    <div class="room-list" id="room-list">
+      <!-- Room items will be dynamically generated here -->
+    </div>
+  </div>
+</div>
+
+<!-- Room Addition Form -->
+<div class="slider-overlay">
+  <div class="slider down">
+    <div class="admin-container">
+      <div class="column-stack">
+        <button class="buttons" onclick="toggleSliderDown()">Back</button>
+      </div>
+      <h2 id="popUpTitle">Add New Room</h2>
+      <div class="form-group">
+        <label for="room-name">Room Name:</label>
+        <input type="text" id="room-name" placeholder="Enter room name" />
+      </div>
+      <!-- <div class="form-group">
+        <label for="room-type">Room Type:</label>
+        <input
+          type="text"
+          id="room-type"
+          placeholder="e.g., Small, Medium, Large"
+        />
+      </div> -->
+      <div class="form-group">
+        <label for="room-capacity">Capacity:</label>
+        <input
+          type="number"
+          id="room-capacity"
+          placeholder="Enter room capacity"
+        />
+      </div>
+      <div class="form-group">
+        <label for="room-price">price per day:</label>
+        <input
+          type="number"
+          id="room-price"
+          placeholder="enter price per day"
+        />
+      </div>
+      <div class="form-group">
+        <label for="roomEarliestBookingTime">Earliest booking time:</label>
+        <input
+          type="number"
+          id="roomEarliestBookingTime"
+          placeholder="earliest booking time"
+        />
+      </div>
+      <div class="form-group">
+        <label for="roomLatestBookingTime">Latest booking time:</label>
+        <input
+          type="number"
+          id="roomLatestBookingTime"
+          placeholder="latest booking time"
+        />
+      </div>
+      <div class="form-group invisible" id="isActiveParent">
+        <label for="room-price">Available for booking</label>
+        <input type="checkbox" id="isActive" />
+      </div>
+      <div class="form-group">
+        <label for="promo-code"
+          >Promotional Code (use comma to separate values):</label
+        >
+        <input type="text" id="promo-code" placeholder="Enter promo code" />
+      </div>
+      <div class="column-stack">
+        <button class="button" onclick="onSaveButtonClicked()" id="saveButton">
+          Save
+        </button>
+        <button
+          class="button invisible"
+          onclick="onDeleteButtonClicked()"
+          id="deleteButton"
+        >
+          delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // initialise auth
+  if (window.auth.state.credentials === undefined) {
+    alert("Not logged in as admin, redirecting back to home");
+    location.reload();
+  }
+  if (!window.auth.state.credentials.isStaff) {
+    alert("Not logged in as admin, redirecting back to home");
+    location.reload();
+  }
+
+  // render rooms
+  window.render.allRooms(document.getElementById("room-list"));
+
+  // handle event callbacks
+  function toggleSliderDown() {
+    document.querySelector(".slider").classList.add("down");
+    document.querySelector(".slider-overlay").classList.remove("fade");
+    context.popUpMode = "";
+    context.currentRoom = null;
+    // show hide dlete button
+    document.getElementById("deleteButton").classList.add("invisible");
+    // show hide the is active checkbox
+    document.getElementById("isActiveParent").classList.add("invisible");
+  }
+  function toggleSliderUp() {
+    document.querySelector(".slider").classList.remove("down");
+    document.querySelector(".slider-overlay").classList.add("fade");
+  }
+
+  const context = {
+    rooms: window.auth.getAllRooms(),
+    popUpMode: "",
+    currentRoom: undefined,
+  };
+
+  // on clicked new room button
+  document.getElementById("addNewRoom").addEventListener("click", () => {
+    toggleSliderUp();
+    context.popUpMode = "create";
+    //  edit text elements
+    document.querySelector("#popUpTitle").innerHTML = `Add a new room`;
+    // popullate fields
+    document.querySelector("input#room-name").value = "";
+    document.querySelector("#room-capacity").value = "";
+    document.querySelector("#room-price").value = "";
+    document.querySelector("#promo-code").value = "";
+  });
+
+  // on clicked edit button
+  async function onEditButtonClicked(id) {
+    // // get room data
+    const res = await window.auth.getAllRooms();
+    const roomData = res.rooms.find((room) => room.roomId === id);
+    console.log(roomData);
+    context.popUpMode = "edit";
+    context.currentRoom = roomData.roomId;
+    // toggle slide up
+    toggleSliderUp();
+    //  edit text elements
+    document.querySelector(
+      "#popUpTitle"
+    ).innerHTML = `Editing: ${roomData.roomName}`;
+    // popullate fields
+    document.querySelector("input#room-name").value = roomData.roomName;
+    document.querySelector("#room-capacity").value = roomData.roomCapacity;
+    document.querySelector("#room-price").value = roomData.pricePerHour;
+    document.querySelector("#roomEarliestBookingTime").value =
+      roomData.earliestBookingTime;
+    document.querySelector("#roomLatestBookingTime").value =
+      roomData.latestBookingTime;
+    document.querySelector("#promo-code").value =
+      roomData.promoCodes.toString();
+    if (roomData.isActive) {
+      document.querySelector("#isActive").checked = true;
+    } else {
+      document.querySelector("#isActive").checked = false;
+    }
+    roomData.promoCodes.toString();
+    // show delete button
+    document.getElementById("deleteButton").classList.remove("invisible");
+    // show hide the is active checkbox
+    document.getElementById("isActiveParent").classList.remove("invisible");
+  }
+
+  async function onSaveButtonClicked() {
+    // get fields
+    const roomName = document.querySelector("input#room-name").value;
+    const roomCapacity = document.querySelector("#room-capacity").value;
+    const pricePerHour = document.querySelector("#room-price").value;
+    const promoCodes = document.querySelector("#promo-code").value;
+    const isActive = document.querySelector("#isActive").checked;
+    const earliestBookingTime = document.querySelector(
+      "#roomEarliestBookingTime"
+    ).value;
+    const latestBookingTime = document.querySelector(
+      "#roomLatestBookingTime"
+    ).value;
+    [(roomName, roomCapacity, pricePerHour, promoCodes)].forEach((element) => {
+      if (element === "") {
+        alert("not all fields are filled");
+        throw "not all fields are filled";
+      }
+    });
+    // check fields
+    [
+      roomCapacity,
+      pricePerHour,
+      earliestBookingTime,
+      latestBookingTime,
+    ].forEach((element) => {
+      if (!isNumber(element)) {
+        alert("room capacity or price per hour is not a number");
+        throw "not all fields are filled";
+      }
+    });
+    // check booking times
+    if (Number(earliestBookingTime) < 0) {
+      alert("earliest booking time cannot be less than 0");
+      throw "earliest booking time cannot be less than 0";
+    }
+    // check booking times
+    if (Number(latestBookingTime) > 24) {
+      alert("earliest booking time cannot be greater than 24");
+      throw "earliest booking time cannot be greater than 24";
+    }
+    // if mode is create
+    if (context.popUpMode === "create") {
+      console.log("saving new room to server");
+      const res = await window.auth.createRoom({
+        roomName,
+        roomCapacity,
+        pricePerHour,
+        promoCodes: promoCodes.split(","),
+        latestBookingTime,
+        earliestBookingTime,
+      });
+      if (res.status === "ok") {
+        alert("room has been created");
+        location.reload();
+      } else {
+        alert("somethign went wrong");
+      }
+    }
+    // if mode is edit
+    if (context.popUpMode === "edit") {
+      console.log("saving edits to server");
+      console.log(isActive);
+      const res = await window.auth.updateRoom(context.currentRoom, {
+        roomName,
+        roomCapacity,
+        pricePerHour,
+        promoCodes: promoCodes.split(","),
+        isActive: isActive,
+        latestBookingTime,
+        earliestBookingTime,
+      });
+      if (res.status === "ok") {
+        alert("room has been saved");
+        location.reload();
+      } else {
+        alert("somethign went wrong");
+      }
+    }
+  }
+  async function onDeleteButtonClicked() {
+    const res = await window.auth.deleteRoom(context.currentRoom);
+    if (res.status === "ok") {
+      alert("room has been deleted");
+      location.reload();
+    } else {
+      alert("somethign went wrong");
+    }
+  }
+  // utilities
+  function isNumber(value) {
+    return /^-?\d+(\.\d+)?$/.test(value);
+  }
+</script>

@@ -18,6 +18,8 @@ expressApp.use(
     })
 );
 
+expressApp.use(express.static('./public'));
+
 // ---------------------------------- room stuff
 // register
 expressApp.post("/register", async (req, res) => {

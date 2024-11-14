@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - UOW Room Booking</title>
+    <style>
+        /* (Your existing styles remain unchanged) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #000;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-profile span {
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .button {
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .button:hover {
+            background-color: #333;
+        }
+
+        .room-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .room-card {
+            display: flex;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .room-card img {
+            width: 40%;
+            object-fit: cover;
+        }
+
+        .room-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 60%;
+        }
+
+        .view-button {
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .view-button:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>University of Wollongong</h1>
+        <div class="user-profile">
+            <span id="user-name">Guest</span>
+            <button class="button" onclick="window.location.href='my-bookings.html';">View Bookings</button>
+        </div>
+    </header>
+
+    <div class="room-container" id="room-container">
+        <!-- Room cards will be dynamically generated here -->
+    </div>
+
+    <script>
+        window.onload = function () {
+            // Display logged-in user's name
+            const userName = localStorage.getItem('loggedInUser') || 'Guest';
+            document.getElementById('user-name').textContent = userName;
+
+            // Load and display rooms from localStorage
+            displayRooms();
+        };
+
+        function displayRooms() {
+            const roomContainer = document.getElementById('room-container');
+            const rooms = JSON.parse(localStorage.getItem('rooms')) || [];
+
+            // Clear existing room cards
+            roomContainer.innerHTML = '';
+
+            // Loop through each room and create a card for it
+            rooms.forEach((room, index) => {
+                const roomCard = document.createElement('div');
+                roomCard.className = 'room-card';
+
+                roomCard.innerHTML = `
+                    <img src="Meeting room.jpg" alt="Room Image">
+                    <div class="room-info">
+                        <h2>${room.name}</h2>
+                        <p><strong>Type:</strong> ${room.type}</p>
+                        <p><strong>Capacity:</strong> ${room.capacity}</p>
+                        <p><strong>Price per Day:</strong> $${room.price}</p>
+                        ${room.promoCode ? `<p><strong>Promo Code:</strong> ${room.promoCode}</p>` : ''}
+                        <button class="view-button" onclick="goToRoomDetails(${index}, '${room.type}');">View Details</button>
+                    </div>
+                `;
+                
+                roomContainer.appendChild(roomCard);
+            });
+        }
+
+        function goToRoomDetails(roomIndex, roomType) {
+            // Save the selected room's index in localStorage
+            localStorage.setItem('selectedRoomIndex', roomIndex);
+
+            // Redirect based on room type
+            let detailsPage;
+            if (roomType.toLowerCase() === 'small') {
+                detailsPage = 'room-details-small.html';
+            } else if (roomType.toLowerCase() === 'medium') {
+                detailsPage = 'room-details-medium.html';
+            } else if (roomType.toLowerCase() === 'large') {
+                detailsPage = 'room-details-large.html';
+            } else {
+                alert('Room type not recognized.');
+                return;
+            }
+
+            // Redirect to the specific room details page
+            window.location.href = detailsPage;
+        }
+    </script>
+
+</body>
+</html>

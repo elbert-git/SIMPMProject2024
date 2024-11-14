@@ -1,0 +1,431 @@
+<style>
+  .booking-container {
+    width: 80%;
+    max-width: 800px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+  }
+
+  .booking {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+  }
+
+  .booking button {
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  .booking button:hover {
+    background-color: #333;
+  }
+
+  .modify-dates {
+    display: none;
+    margin-top: 10px;
+  }
+
+  .back-button {
+    margin-top: 20px;
+    background-color: #6200ea;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .back-button:hover {
+    background-color: #4b00b1;
+  }
+
+  .slider-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #000000c1;
+    transition: 0.3s;
+  }
+  .slider {
+    transition: 0.3s;
+    position: relative;
+    top: 0%;
+    padding: 1rem;
+    height: 100%;
+  }
+  .down {
+    background-color: #00000000;
+    pointer-events: none;
+  }
+  .down .slider {
+    top: 100%;
+  }
+
+  .card {
+    background-color: white;
+    max-width: 600px;
+    width: 100%;
+    border-radius: 1rem;
+    overflow-y: scroll;
+    height: 100%;
+    padding: 1rem;
+  }
+
+  .card h1 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .card h2 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .room-display {
+    display: flex;
+    -webkit-box-shadow: -1px 10px 20px 0px rgba(0, 0, 0, 0.12);
+    -moz-box-shadow: -1px 10px 20px 0px rgba(0, 0, 0, 0.12);
+    box-shadow: -1px 10px 20px 0px rgba(0, 0, 0, 0.12);
+    width: 100%;
+    border-radius: 1rem;
+    height: 10rem;
+    min-height: 10rem;
+    overflow: hidden;
+    border: 2px black solid;
+  }
+    .room-display img{
+        width: 50%;
+    } 
+  .room-display-details{
+    flex-grow: 1;
+    padding: 1rem;
+  }
+  .room-display-details h3{
+    margin-bottom: 1rem;
+  }
+
+  .card select{
+    padding: 0.5rem;
+    margin: 1rem;
+  }
+
+  #timeSelector option:disabled{
+    color: rgb(207, 207, 207);
+  }
+
+  #newBookingButton{
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 600px;
+    height: 2rem;
+  }
+
+  .main{
+    width: 100vw;
+    padding: 1rem;
+  }
+
+
+</style>
+
+<div class="column-stack main">
+  <h1 class="page-title">Your Bookings</h1>
+  <button class="buttons" onclick="newBookingButtonClicked()" id="newBookingButton">
+    Book a room
+  </button>
+  <div class="booking-container" id="booking-container"></div>
+  </div>
+</div>
+
+<div class="slider-overlay down">
+  <div class="slider column-stack">
+    <div class="card column-stack">
+      <button class="buttons" id="backButon" onclick="toggleDown()">
+        Back
+      </button>
+      <h1>Create a booking</h1>
+      <!-- room selector -->
+      <h2>Selected Room</h2>
+      <div class="room-display">
+        <img src="assets/meetingRoom.jpg" alt="" />
+        <div class="room-display-details">
+          <h3 id="roomName">---</h3>
+          <div><strong>Capacity</strong>: <span id="roomCapacity">---</span></div>
+          <div>
+            <strong>Rent per hour</strong>: $<span id="costPerHour">---</span>
+          </div>
+        </div>
+      </div>
+      <select name="" id="roomSelector">
+        <option value="d">room name</option>
+        <option value="d">room name</option>
+        <option value="d">room name</option>
+        <option value="d">room name</option>
+      </select>
+
+      <!-- date selector -->
+      <h2>Set a date</h2>
+      <input type="date" id="dateSelector" />
+      <!-- time selector -->
+      <h2>Set a time</h2>
+      <p>Every booking is an hour</p>
+      <select name="" id="timeSelector">
+        <option value="d">room name</option>
+      </select>
+      <!-- payment -->
+      <h2>Payment</h2>
+      <p>Every booking creation or edit is a new payment</p>
+    <div class="payment-container column-stack">
+        <input type="text" placeholder="Card Number">
+        <input type="text" placeholder="MM/YY">
+        <input type="text" placeholder="CVC">
+        <input type="text" placeholder="Promo Code (Optional)">
+    </div>
+      <!-- Pay and save -->
+      <button class="buttons" id="saveButton">Save</button>
+      <!-- delete -->
+      <button class="buttons hide" id="deleteButton">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+    const context = {
+        rooms: [],
+        currentRoom: null,
+        currentBooking: null,
+        currentMode: "",
+        bookings: [],
+    }
+    // on start render rooms in select
+    const onStart = async ()=>{
+        // clear select tag
+        const selectTag = document.getElementById("roomSelector")
+        selectTag.innerHTML = `<option value="" disabled selected>Select a room</option>`
+        // get rooms
+        const res = await window.auth.getAllRooms()
+        const rooms = res.rooms
+        context.rooms = rooms
+        // add rooms 
+        rooms.forEach(room => {
+            if(room.isActive){
+                const option = document.createElement("option")
+                option.innerHTML = room.roomName
+                option.value = room.roomId
+                selectTag.appendChild(option) 
+            }
+        });
+        // setup time selector
+        const timeSelector = document.getElementById("timeSelector")
+        timeSelector.innerHTML = `<option value="" disabled selected>Select a time</option>`
+        for (let index = 0; index < 24; index++) {
+                const option = document.createElement("option")
+                option.innerHTML = index.toString().padStart(2, '0') + ":00"
+                option.disabled = true
+                option.value = index
+                timeSelector.appendChild(option) 
+        }
+        // render current bookings
+        window.render.renderBookings(document.getElementById('booking-container'))
+        // setup bookings context
+        const bookingRes = await window.auth.getBookingsByUserEmail(window.auth.state.credentials.email)
+        context.bookings = bookingRes.bookings
+    }
+    onStart()
+  // event callbacks
+  const selectTag = document.getElementById("roomSelector")
+  selectTag.addEventListener('change', ()=>{
+    // get selected room
+    const choiceId = selectTag.options[selectTag.selectedIndex].value
+    context.currentRoom = context.rooms.find(room => room.roomId === choiceId)
+    // show current selected room
+    document.getElementById("roomName").innerHTML = context.currentRoom.roomName
+    document.getElementById("costPerHour").innerHTML = context.currentRoom.pricePerHour
+    document.getElementById("roomCapacity").innerHTML = context.currentRoom.roomCapacity
+    // set time
+    const timeSelector = document.getElementById("timeSelector")
+    for (let index = 0; index < timeSelector.options.length; index++) {
+        // ignore first option
+        if(index === 0){ continue; }
+        // disable times too early
+        if(index-1 < context.currentRoom.earliestBookingTime){
+            timeSelector.options[index].disabled = true
+        }else{
+            timeSelector.options[index].disabled = false
+        }
+        if(index-1 > context.currentRoom.latestBookingTime){
+            timeSelector.options[index].disabled = true
+        }else{
+            timeSelector.options[index].disabled = false
+        }
+    }
+  })
+  document.getElementById("saveButton").addEventListener('click', async ()=>{
+    // prevent no room selected
+    if(!context.currentRoom){
+        alert("no room selected");
+        throw "no room selected"
+    }
+    // get fields
+    const date = document.getElementById('dateSelector').value || null
+    const time = document.getElementById("timeSelector").options[document.getElementById("timeSelector").selectedIndex].value || null
+    const roomId = context.currentRoom.roomId || null;
+    const email = window.auth.state.credentials.email || null;
+    // verify fields
+    [date, time, roomId, email].forEach((field)=>{
+        console.log(field)
+        if(field === null || field === undefined){
+            alert("some fields are empty");
+            throw "some fields are empty"
+        }
+    })
+    if(!isTodayOrFutureDate(date)){
+        alert("Date is in the past")
+        throw "Date is in the past"
+    }
+    // branch based on mode to create or update
+    if(context.currentMode === "create"){
+        const res = await window.auth.createBooking({
+            date,time,roomId,email
+        })
+        if(res.status === "ok"){
+            alert("Booking created!")
+            location.reload()
+        }else{
+            alert(res.message)
+        }
+    }else{
+        const res = await window.auth.updateBooking(context.currentBooking._id, {
+            date,time,roomId,email
+        })
+        if(res.status === "ok"){
+            alert("Booking edited!")
+            location.reload()
+        }else{
+            alert(res.message)
+        }
+    }
+    // save fields based on action
+  })
+  function onEditButtonPressed(id){
+    // toggle up
+    toggleUp()
+    // set mode to update
+    context.currentMode = "update"
+    // set contexts
+    context.currentBooking = context.bookings.find(book => book._id === id)
+    context.currentRoom = context.rooms.find(room => room.roomId === context.currentBooking.roomId)
+    console.log(context)
+    // populate room display
+    document.getElementById("roomName").innerHTML = context.currentRoom.roomName
+    document.getElementById("costPerHour").innerHTML = context.currentRoom.pricePerHour
+    document.getElementById("roomCapacity").innerHTML = context.currentRoom.roomCapacity
+    // populate ui fields
+    // room selector
+    const roomSelector = document.getElementById('roomSelector')
+    for (let index = 1; index < roomSelector.options.length; index++) {
+        const option = roomSelector.options[index]
+        if(option.value === context.currentRoom.roomId){
+            option.selected = true;
+            break;
+        }
+    }
+    // show delete button
+    document.getElementById("deleteButton").classList.remove('hide')
+    // date selector
+    document.getElementById("dateSelector").value = context.currentBooking.date
+    // time selector
+    const timeSelector= document.getElementById('timeSelector')
+    // make time available as per limits
+    for (let index = 0; index < timeSelector.options.length; index++) {
+        // ignore first option
+        if(index === 0){ continue; }
+        // disable times too early
+        if(index-1 < context.currentRoom.earliestBookingTime){
+            timeSelector.options[index].disabled = true
+        }else{
+            timeSelector.options[index].disabled = false
+        }
+        if(index-1 > context.currentRoom.latestBookingTime){
+            timeSelector.options[index].disabled = true
+        }else{
+            timeSelector.options[index].disabled = false
+        }
+    }
+    // select correct time
+    for (let index = 1; index < timeSelector.options.length; index++) {
+        const option = timeSelector.options[index]
+        if(option.value.toString() === context.currentBooking.time.toString()){
+            option.selected = true;
+            break;
+        }
+    }
+  }
+  document.getElementById("deleteButton").addEventListener('click', async ()=>{
+    const res = await window.auth.deleteBooking(context.currentBooking._id)
+    if(res.status === "ok"){
+        alert("Booking Deleted")
+        location.reload()
+    }else{
+        alert(res.message)
+    }
+  })
+  function toggleUp() {
+    document.querySelector(".slider-overlay").classList.remove("down");
+  }
+  function toggleDown() {
+    document.querySelector(".slider-overlay").classList.add("down");
+    // clear context 
+    context.currentRoom = null
+    context.currentBooking = null
+    context.currentMode = ""
+    // clear current selected room display
+    document.getElementById("roomName").innerHTML = "---"
+    document.getElementById("costPerHour").innerHTML = "---"
+    document.getElementById("roomCapacity").innerHTML = "---"
+    // clear fields
+    document.getElementById("roomSelector").options[0].selected = true
+    document.getElementById("timeSelector").options[0].selected = true
+    document.getElementById("dateSelector").value = ""
+    // remove delete button
+    document.getElementById("deleteButton").classList.add('hide')
+  }
+  function newBookingButtonClicked() {
+    // toggle up
+    toggleUp();
+    // set mode to create
+    context.currentMode = "create"
+  }
+
+  window.onload = function () {
+    displayBookings();
+  };
+
+  function goToHome() {
+    window.location.href = "home.html";
+  }
+
+  // utility
+    function isTodayOrFutureDate(dateString) {
+            // Parse the date string as yyyy/mm/dd
+            const inputDate = new Date(dateString);
+            const today = new Date();
+            // Set both dates' time to midnight to compare only dates
+            inputDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+
+            return inputDate >= today;
+    }
+</script>

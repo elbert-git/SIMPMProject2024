@@ -1,0 +1,35 @@
+<style>
+  main {
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+</style>
+
+<main class="column-stack">
+  <input type="text" id="register-username" placeholder="Username" required />
+  <input type="email" id="register-email" placeholder="Email" required />
+  <input
+    type="password"
+    id="register-password"
+    placeholder="Password"
+    required
+  />
+  <button class="buttons" id="registerButton">Register</button>
+</main>
+<script>
+  document
+    .getElementById("registerButton")
+    .addEventListener("click", async () => {
+      const res = await window.auth.register(
+        document.getElementById("register-email").value,
+        document.getElementById("register-username").value,
+        document.getElementById("register-password").value,
+        false
+      );
+      if (res.status === "ok") {
+        window.router.go("./pages/student-login.html");
+      } else {
+        alert(res.message);
+      }
+    });
+</script>

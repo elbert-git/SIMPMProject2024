@@ -1,0 +1,62 @@
+<header>
+  <style>
+    header {
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      background-color: black;
+      color: white;
+      padding: 0.5rem;
+    }
+    .header-right-section {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+    }
+    #logoutButton {
+      background-color: white;
+      color: black;
+    }
+    @media (max-width: 600px) {
+      header {
+        font-size: 0.5rem;
+      }
+      header h1 {
+        display: flex;
+        align-items: center;
+      }
+      header p {
+        display: none;
+      }
+      headers .buttons {
+        font-size: 0.5rem !important;
+      }
+    }
+    .hide {
+      display: none;
+    }
+  </style>
+  <h1 onclick="location.reload()" class="interactive">
+    University Of Wollogong
+  </h1>
+  <div class="header-right-section hide">
+    <p>Hi <span id="nameLabel">name</span></p>
+    <button id="logoutButton" class="interactive buttons">Log out</button>
+  </div>
+</header>
+
+<script>
+  // get auth
+  // toggle visibility based on auth state
+  if (window.auth.state.credentials) {
+    document.querySelector(".header-right-section").classList.remove("hide");
+    document.querySelector("#nameLabel").innerHTML =
+      window.auth.state.credentials.userName;
+  }
+  document.getElementById("logoutButton").addEventListener("click", () => {
+    // logout
+    window.auth.logout();
+    // referesh
+    location.reload();
+  });
+</script>
