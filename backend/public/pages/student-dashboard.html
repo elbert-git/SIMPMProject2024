@@ -317,6 +317,15 @@
         alert("Date is in the past")
         throw "Date is in the past"
     }
+    // check payment
+    const paymentInputs = document.querySelectorAll(".payment-container input")
+    for (let index = 0; index < paymentInputs.length; index++) {
+        const element = paymentInputs[index];
+        if(element.value === ""){
+            alert("some payment fields are empty");
+            throw "some payment fields are empty"
+        }
+    }
     // branch based on mode to create or update
     if(context.currentMode === "create"){
         const res = await window.auth.createBooking({
