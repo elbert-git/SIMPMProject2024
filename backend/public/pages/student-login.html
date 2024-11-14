@@ -22,7 +22,7 @@
       document.getElementById("login-password").value
     );
     if (res.status === "ok") {
-      window.router.go("./pages/student-dashboard.html");
+      location.reload();
     } else {
       alert(res.message);
     }

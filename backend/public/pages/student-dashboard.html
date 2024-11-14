@@ -137,7 +137,19 @@
     padding: 1rem;
   }
 
+  .payment-container input{
+    margin-top: 1rem;
+  }
 
+  #saveButton {
+    margin-top: 1rem !important;
+    width: 100%;
+    font-size: 1.25rem;
+  }
+  
+  #deleteButton{
+    margin-top: 1rem !important;
+  }
 </style>
 
 <div class="column-stack main">
@@ -155,7 +167,7 @@
       <button class="buttons" id="backButon" onclick="toggleDown()">
         Back
       </button>
-      <h1>Create a booking</h1>
+      <h1 id="popUpTitle">Create a booking</h1>
       <!-- room selector -->
       <h2>Selected Room</h2>
       <div class="room-display">
@@ -185,13 +197,13 @@
         <option value="d">room name</option>
       </select>
       <!-- payment -->
-      <h2>Payment</h2>
+      <h2 id="paymentHeader">Payment: $<span id="costSlot">--</span></h2>
       <p>Every booking creation or edit is a new payment</p>
     <div class="payment-container column-stack">
-        <input type="text" placeholder="Card Number">
-        <input type="text" placeholder="MM/YY">
-        <input type="text" placeholder="CVC">
-        <input type="text" placeholder="Promo Code (Optional)">
+        <input placeholder="Card Number" type="tel" inputmode="numeric" pattern="[0-9\s]{13,19}" autocomplete="cc-number" maxlength="19">
+        <input type="numeric" placeholder="MM/YY" maxlength="5">
+        <input type="numeric" placeholder="CVC" maxlength="3">
+        <input type="text" placeholder="Promo Code (Optional)" id="promo">
     </div>
       <!-- Pay and save -->
       <button class="buttons" id="saveButton">Save</button>
@@ -245,6 +257,14 @@
     }
     onStart()
   // event callbacks
+  document.getElementById("promo").addEventListener("input", ()=>{
+    const value = document.getElementById("promo").value
+    if(context.currentRoom.promoCodes.indexOf(value) > -1){
+        document.getElementById("costSlot").innerHTML = context.currentRoom.pricePerHour/2
+    }else{
+        console.log("incorrect promo")
+    }
+  })
   const selectTag = document.getElementById("roomSelector")
   selectTag.addEventListener('change', ()=>{
     // get selected room
@@ -271,6 +291,8 @@
             timeSelector.options[index].disabled = false
         }
     }
+    // show cost
+    document.getElementById("costSlot").innerHTML = context.currentRoom.pricePerHour
   })
   document.getElementById("saveButton").addEventListener('click', async ()=>{
     // prevent no room selected
@@ -320,6 +342,8 @@
     // save fields based on action
   })
   function onEditButtonPressed(id){
+    // change title
+    document.getElementById("popUpTitle").innerHTML = "Edit your booking"
     // toggle up
     toggleUp()
     // set mode to update
@@ -332,6 +356,8 @@
     document.getElementById("roomName").innerHTML = context.currentRoom.roomName
     document.getElementById("costPerHour").innerHTML = context.currentRoom.pricePerHour
     document.getElementById("roomCapacity").innerHTML = context.currentRoom.roomCapacity
+    // show cost
+    document.getElementById("costSlot").innerHTML = context.currentRoom.pricePerHour
     // populate ui fields
     // room selector
     const roomSelector = document.getElementById('roomSelector')
@@ -401,31 +427,36 @@
     document.getElementById("dateSelector").value = ""
     // remove delete button
     document.getElementById("deleteButton").classList.add('hide')
+    // clear payment
+    const paymentInputs = document.querySelectorAll(".payment-container input")
+    console.log(paymentInputs)
+    for (let index = 0; index < paymentInputs.length; index++) {
+        const element = paymentInputs[index];
+        element.value = ""
+    }
   }
   function newBookingButtonClicked() {
     // toggle up
     toggleUp();
     // set mode to create
     context.currentMode = "create"
+    // change title
+    document.getElementById("popUpTitle").innerHTML = "Create a booking"
   }
-
-  window.onload = function () {
-    displayBookings();
-  };
 
   function goToHome() {
     window.location.href = "home.html";
   }
 
-  // utility
+    // utility
     function isTodayOrFutureDate(dateString) {
-            // Parse the date string as yyyy/mm/dd
-            const inputDate = new Date(dateString);
-            const today = new Date();
-            // Set both dates' time to midnight to compare only dates
-            inputDate.setHours(0, 0, 0, 0);
-            today.setHours(0, 0, 0, 0);
+        // Parse the date string as yyyy/mm/dd
+        const inputDate = new Date(dateString);
+        const today = new Date();
+        // Set both dates' time to midnight to compare only dates
+        inputDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
 
-            return inputDate >= today;
+        return inputDate >= today;
     }
 </script>
