@@ -200,9 +200,9 @@
       <h2 id="paymentHeader">Payment: $<span id="costSlot">--</span></h2>
       <p>Every booking creation or edit is a new payment</p>
     <div class="payment-container column-stack">
-        <input placeholder="Card Number" type="tel" inputmode="numeric" pattern="[0-9\s]{13,19}" autocomplete="cc-number" maxlength="19">
-        <input type="numeric" placeholder="MM/YY" maxlength="5">
-        <input type="numeric" placeholder="CVC" maxlength="3">
+        <input class="payment-must" placeholder="Card Number" type="tel" inputmode="numeric" pattern="[0-9\s]{13,19}" autocomplete="cc-number" maxlength="19">
+        <input class="payment-must" type="numeric" placeholder="MM/YY" maxlength="5">
+        <input class="payment-must" type="numeric" placeholder="CVC" maxlength="3">
         <input type="text" placeholder="Promo Code (Optional)" id="promo">
     </div>
       <!-- Pay and save -->
@@ -307,7 +307,6 @@
     const email = window.auth.state.credentials.email || null;
     // verify fields
     [date, time, roomId, email].forEach((field)=>{
-        console.log(field)
         if(field === null || field === undefined){
             alert("some fields are empty");
             throw "some fields are empty"
@@ -318,7 +317,8 @@
         throw "Date is in the past"
     }
     // check payment
-    const paymentInputs = document.querySelectorAll(".payment-container input")
+    console.log("check payment")
+    const paymentInputs = document.querySelectorAll(".payment-must")
     for (let index = 0; index < paymentInputs.length; index++) {
         const element = paymentInputs[index];
         if(element.value === ""){
